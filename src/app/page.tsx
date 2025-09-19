@@ -1,7 +1,9 @@
+import NavBar from "@/features/navigation/NavBar";
+
 export default function Home() {
   return (
     <>
-      <span className="font-sans">Hello</span>
+      <NavBar />
     </>
   );
 }
