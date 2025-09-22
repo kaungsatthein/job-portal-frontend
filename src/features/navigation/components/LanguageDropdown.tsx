@@ -22,9 +22,11 @@ const LanguageDropdown = () => {
   return (
     <DropdownMenu onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-accent/50 transition">
+        <button className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-accent/50 transition cursor-pointer">
           <span className="text-lg">{selectedLanguage.flag}</span>
-          <span className="text-sm">{selectedLanguage.label}</span>
+          <span className="text-sm hidden lg:inline-block">
+            {selectedLanguage.label}
+          </span>
           {isOpen ? (
             <ChevronUp className="h-4 w-4" />
           ) : (
