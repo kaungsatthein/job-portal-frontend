@@ -4,7 +4,7 @@ import { Open_Sans } from "next/font/google";
 import "@/styles/globals.css";
 import { ThemeProvider } from "@/features/navigation/components/theme-provider";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "@/lib/common/getMessages";
+import { getMessages } from "@/lib";
 
 const openSans = Open_Sans({
   subsets: ["latin"],
