@@ -8,11 +8,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
+import { use, useState } from "react";
 import { ScanFace, Bell, ChevronDown } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslations } from "next-intl";
 
 const LoginForm = () => {
+  const t = useTranslations("Navigation");
   const [isRecruiter, setIsRecruiter] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -41,7 +43,7 @@ const LoginForm = () => {
   return (
     <Dialog>
       <DialogTrigger className="text-sm font-semibold px-2 py-1 cursor-pointer">
-        Login
+        {t("Login")}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
