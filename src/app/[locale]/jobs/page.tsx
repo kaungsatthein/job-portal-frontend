@@ -72,7 +72,7 @@ export default async function JobsPage({
   const { what, where } = params;
 
   return (
-    <div className="flex flex-col items-center w-full gap-10">
+    <div className="mt-10 mx-4 lg:mx-8">
       <JobSearchBar what={what} where={where} />
       <JobList jobs={jobs} />
     </div>

@@ -7,6 +7,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "@/lib";
 import { ToastWrapper } from "@/components/common";
 import NavBar from "@/features/navigation/NavBar";
+import Footer from "@/features/Footer";
 
 const openSans = Open_Sans({
   subsets: ["latin"],
@@ -55,6 +56,7 @@ export default async function RootLayout({
           >
             <NavBar />
             {children}
+            {/* <Footer /> */}
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>
