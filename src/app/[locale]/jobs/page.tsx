@@ -1,11 +1,12 @@
 import { JobSearchBar } from "@/features/job";
 
-export default function JobsPage({
+export default async function JobsPage({
   searchParams,
 }: {
-  searchParams: { what?: string; where?: string };
+  searchParams: Promise<{ what?: string; where?: string }>;
 }) {
-  const { what, where } = searchParams;
+  const params = await searchParams;
+  const { what, where } = params;
 
   return (
     <>
