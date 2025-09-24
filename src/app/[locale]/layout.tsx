@@ -56,7 +56,7 @@ export default async function RootLayout({
           >
             <NavBar />
             {children}
-            {/* <Footer /> */}
+            <Footer />
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

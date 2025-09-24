@@ -1,8 +1,8 @@
-import { JobSearchBar } from "@/features/job";
+import { JobSearchBar, TrendingJobs } from "@/features/job";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center mt-20 w-full">
+    <div className="mx-4 lg:mx-8">
       <JobSearchBar />
       <div className="mt-6 text-center">
         <span className="text-sm text-muted-foreground">
@@ -10,6 +10,7 @@ export default function Home() {
           now
         </span>
       </div>
+      <TrendingJobs />
     </div>
   );
 }
