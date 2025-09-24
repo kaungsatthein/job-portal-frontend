@@ -30,7 +30,7 @@ const JobDetailwithBg = ({
 export const JobCard = ({ job }: JobCardProps) => {
   return (
     <div
-      className="w-full space-y-2 rounded-md p-4 border hover:border-green-300 h-[310px] shadow-lg"
+      className="w-full space-y-2 rounded-md p-4 border active:border-green-300 select h-[310px] shadow-lg hover:shadow-xl"
       key={job?.id}
     >
       <p className="bg-blue-200 p-1.5 rounded-sm text-primary max-w-max text-xs">

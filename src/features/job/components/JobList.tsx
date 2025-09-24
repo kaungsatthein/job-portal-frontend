@@ -1,6 +1,7 @@
 import React from "react";
 import { Job } from "../type";
 import { JobCard } from "./JobCard";
+import { JobDetailCard } from "./JobDetailCard";
 
 interface JobListProps {
   jobs: Job[];
@@ -18,9 +19,7 @@ export const JobList = ({ jobs }: JobListProps) => {
         </div>
       </div>
       {/* list detail */}
-      <div className="w-[60%] h-full bg-red-300">
-        <div className="w-full h-full"></div>
-      </div>
+      <JobDetailCard />
     </div>
   );
 };
