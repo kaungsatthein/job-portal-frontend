@@ -12,6 +12,7 @@ import { use, useState } from "react";
 import { ScanFace, Bell, ChevronDown } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTranslations } from "next-intl";
+import { showToast } from "@/lib";
 
 const LoginForm = () => {
   const t = useTranslations("Navigation");
@@ -21,6 +22,7 @@ const LoginForm = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoggedIn(true);
+    showToast("success", "Logged in successfully!");
   };
 
   if (isLoggedIn) {

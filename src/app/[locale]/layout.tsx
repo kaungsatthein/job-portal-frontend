@@ -5,6 +5,7 @@ import "@/styles/globals.css";
 import { ThemeProvider } from "@/features/navigation/components/theme-provider";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "@/lib";
+import { ToastWrapper } from "@/components/common";
 
 const openSans = Open_Sans({
   subsets: ["latin"],
@@ -43,6 +44,7 @@ export default async function RootLayout({
               : "var(--font-z06-walone-bold)",
         }}
       >
+        <ToastWrapper />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider
             attribute="class"
