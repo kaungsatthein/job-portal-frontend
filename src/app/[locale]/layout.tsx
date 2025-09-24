@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/features/navigation/components/theme-provider";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "@/lib";
 import { ToastWrapper } from "@/components/common";
+import NavBar from "@/features/navigation/NavBar";
 
 const openSans = Open_Sans({
   subsets: ["latin"],
@@ -52,6 +53,7 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <NavBar />
             {children}
           </ThemeProvider>
         </NextIntlClientProvider>
