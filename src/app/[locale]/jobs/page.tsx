@@ -10,7 +10,9 @@ export default async function JobsPage({
 
   return (
     <>
-      <JobSearchBar what={what} where={where} />
+      <div className="mt-10 mx-4 lg:mx-8">
+        <JobSearchBar what={what} where={where} />
+      </div>
     </>
   );
 }
