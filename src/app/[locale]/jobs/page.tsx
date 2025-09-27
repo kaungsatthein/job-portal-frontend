@@ -1,4 +1,4 @@
-import { JobList, JobSearchBar } from "@/features/job";
+import { JobFilter, JobList, JobSearchBar } from "@/features/job";
 
 export const jobs = [
   {
@@ -72,8 +72,11 @@ export default async function JobsPage({
   const { what, where } = params;
 
   return (
-    <div className="mt-10 mx-4 lg:mx-8">
+    <div className="mt-5 mx-4 lg:mx-8">
       <JobSearchBar what={what} where={where} />
+      <div className="mt-3 mb-5">
+        <JobFilter />
+      </div>
       <JobList jobs={jobs} />
     </div>
   );
