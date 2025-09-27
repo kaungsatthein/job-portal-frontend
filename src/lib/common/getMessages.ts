@@ -2,7 +2,9 @@ import en from "@/messages/en.json";
 import mm from "@/messages/mm.json";
 import { notFound } from "next/navigation";
 
-const messagesMap: Record<string, any> = { en, mm };
+type Messages = typeof en;
+
+const messagesMap: Record<string, Messages> = { en, mm };
 
 export default function getMessages(locale: string) {
   const messages = messagesMap[locale];
