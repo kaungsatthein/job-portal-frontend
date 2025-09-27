@@ -31,9 +31,8 @@ export default function JobSearchBar({
           where: whereInput.value || undefined,
         });
       }}
-      className="sm:w-full lg:max-w-4xl "
     >
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end sm:w-full lg:max-w-4xl ">
         <div className="flex-1">
           <label
             htmlFor="what"
