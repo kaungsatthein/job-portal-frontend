@@ -1,10 +1,14 @@
+"use client";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MyJobs from "./MyJobs";
 import PostJobs from "./PostJobs";
-import Applicants from "./Applicants";
 import Account from "./Account";
+import Company from "./Company";
+import { useState } from "react";
 
 const RecruiterScreen = () => {
+  const [tab, setTab] = useState("myJobs");
   return (
     <div className="mx-4 lg:mx-8">
       <div>
@@ -15,21 +19,21 @@ const RecruiterScreen = () => {
           Manage your jobs, posts, and accounts
         </span>
       </div>
-      <Tabs defaultValue="myJobs" className="w-full my-6">
+      <Tabs value={tab} onValueChange={setTab} className="w-full my-6">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="myJobs">My Jobs</TabsTrigger>
-          <TabsTrigger value="postJobs">Create Your Jobs</TabsTrigger>
-          <TabsTrigger value="applicants">Applicants</TabsTrigger>
+          <TabsTrigger value="postJobs">Create</TabsTrigger>
+          <TabsTrigger value="myCompany">Company</TabsTrigger>
           <TabsTrigger value="account">Account</TabsTrigger>
         </TabsList>
         <TabsContent value="myJobs" className="mt-3">
           <MyJobs />
         </TabsContent>
         <TabsContent value="postJobs" className="mt-3">
-          <PostJobs />
+          <PostJobs setTab={setTab} />
         </TabsContent>
-        <TabsContent value="applicants" className="mt-3">
-          <Applicants />
+        <TabsContent value="myCompany" className="mt-3">
+          <Company />
         </TabsContent>
         <TabsContent value="account" className="mt-3">
           <Account />
