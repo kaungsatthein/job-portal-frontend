@@ -49,7 +49,7 @@ const PostJobs = ({ setTab }: { setTab: (tab: string) => void }) => {
   );
 
   const handleNext = async () => {
-    let fields: (keyof JobFormValues)[] =
+    const fields: (keyof JobFormValues)[] =
       step === 1
         ? ["title", "companyId"]
         : ["jobType", "location", "salaryRange", "description"];

@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Search, MapPin } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useQueryParams } from "../hooks/useQueryParams";
+import { useTranslations } from "next-intl";
 
 type JobSearchBarProps = {
   what?: string;
@@ -16,9 +17,11 @@ export default function JobSearchBar({
 }: JobSearchBarProps) {
   const pathname = usePathname();
   const segments = pathname.split("/");
-  const locale = segments[1] || "en"; // fallback
+  const locale = segments[1] || "en";
   const action = `/${locale}/jobs`;
   const { push } = useQueryParams();
+  const t = useTranslations("JobSearchBar");
+
   return (
     <form
       onSubmit={(e) => {
@@ -32,23 +35,23 @@ export default function JobSearchBar({
         });
       }}
     >
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end sm:w-full lg:max-w-4xl ">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end sm:w-full lg:max-w-4xl">
         <div className="flex-1">
           <label
             htmlFor="what"
             className="block text-sm font-medium text-foreground mb-1"
           >
-            What
+            {t("what")}
           </label>
           <div className="relative">
             <Input
               id="what"
               name="what"
               type="text"
-              placeholder="Job title, company, keyword"
+              placeholder={t("whatPlaceholder")}
               defaultValue={what}
             />
-            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           </div>
         </div>
 
@@ -57,21 +60,21 @@ export default function JobSearchBar({
             htmlFor="where"
             className="block text-sm font-medium text-foreground mb-1"
           >
-            Where
+            {t("where")}
           </label>
           <div className="relative">
             <Input
               id="where"
               name="where"
               type="text"
-              placeholder="City, district, state"
+              placeholder={t("wherePlaceholder")}
               defaultValue={where}
             />
-            <MapPin className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           </div>
         </div>
 
-        <Button type="submit">Search jobs</Button>
+        <Button type="submit">{t("search")}</Button>
       </div>
     </form>
   );

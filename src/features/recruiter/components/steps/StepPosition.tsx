@@ -75,7 +75,7 @@ const StepPosition = ({
               </DialogHeader>
               <div className="space-y-3 py-4">
                 {mockCompanies.length > 0 ? (
-                  mockCompanies.map((company) => (
+                  mockCompanies.map((company: any) => (
                     <Controller
                       key={company.id}
                       name="companyId"

@@ -1,5 +1,12 @@
 {
   "Navigation": {
     "Login": "Login"
+  },
+  "JobSearchBar": {
+    "what": "What",
+    "where": "Where",
+    "whatPlaceholder": "Job title, company, keyword",
+    "wherePlaceholder": "City, district, state",
+    "search": "Search jobs"
   }
 }

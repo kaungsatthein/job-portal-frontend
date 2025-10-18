@@ -1,5 +1,12 @@
 {
   "Navigation": {
     "Login": "လော့ဂ်အင်"
+  },
+  "JobSearchBar": {
+    "what": "အလုပ်အမျိုးအစား",
+    "where": "တည်နေရာ",
+    "whatPlaceholder": "အလုပ်အမည်၊ ကုမ္ပဏီ၊ စကားစု",
+    "wherePlaceholder": "မြို့၊ တနယ်၊ နယ်မြေ",
+    "search": "အလုပ်ရှာဖွေရန်"
   }
 }
