@@ -1,3 +1,4 @@
+import { Separator } from "@/components/ui/separator";
 import { JobFilter, JobList, JobSearchBar } from "@/features/job";
 
 export const jobs = [
@@ -72,11 +73,14 @@ export default async function JobsPage({
   const { what, where } = params;
 
   return (
-    <div className="mt-5 mx-4 lg:mx-8">
-      <JobSearchBar what={what} where={where} />
-      <div className="mt-3 mb-5">
+    <div className="mt-5">
+      <div className="mx-4 lg:mx-8">
+        <JobSearchBar what={what} where={where} />
+      </div>
+      <div className="mt-3 mb-5 lg:mx-8 mx-4">
         <JobFilter />
       </div>
+      <Separator className="my-8" />
       <JobList jobs={jobs} />
     </div>
   );
