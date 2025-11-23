@@ -1,11 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { LogOut } from "lucide-react";
 
 const Account = () => {
+  const t = useTranslations("Account");
   const handleLogout = () => {
     console.log("logout");
   };
@@ -19,12 +21,12 @@ const Account = () => {
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
             <div className="flex flex-col gap-2">
-              <span className="text-sm">Username</span>
-              <span className="text-sm">Email</span>
+              <span className="text-sm">{t("username")}</span>
+              <span className="text-sm">{t("email")}</span>
             </div>
           </div>
-          <Button size={"sm"} variant={"destructive"} onSubmit={handleLogout}>
-            Logout
+          <Button size={"sm"} variant={"destructive"} onClick={handleLogout}>
+            {t("logout")}
             <LogOut />
           </Button>
         </CardContent>

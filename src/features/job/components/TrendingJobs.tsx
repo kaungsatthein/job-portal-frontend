@@ -3,14 +3,16 @@
 import { useState } from "react";
 import { Search, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
-const jobCategories = [
-  "Popular searches",
-  "Role titles",
-  "Locations",
-  "Companies",
-  "Job types",
-];
+const categoryKeys = [
+  "popular",
+  "roles",
+  "locations",
+  "companies",
+  "types",
+] as const;
+type CategoryKey = (typeof categoryKeys)[number];
 
 const popularSearches = [
   "sap",
@@ -82,16 +84,17 @@ const jobTypes = [
   "consultant",
 ];
 
-const categoryData = {
-  "Popular searches": popularSearches,
-  "Role titles": roleTitles,
-  Locations: locations,
-  Companies: companies,
-  "Job types": jobTypes,
+const categoryData: Record<CategoryKey, string[]> = {
+  popular: popularSearches,
+  roles: roleTitles,
+  locations,
+  companies,
+  types: jobTypes,
 };
 
 export default function TrendingJobs() {
-  const [activeCategory, setActiveCategory] = useState("Popular searches");
+  const [activeCategory, setActiveCategory] = useState<CategoryKey>("popular");
+  const t = useTranslations("TrendingJobs");
 
   const currentSearches =
     categoryData[activeCategory as keyof typeof categoryData];
@@ -102,13 +105,13 @@ export default function TrendingJobs() {
       <div className="flex items-center gap-3 mb-4">
         <TrendingUp className="w-4 h-4 text-primary" />
         <h1 className="text-lg font-semibold text-foreground">
-          Discover trending jobs
+          {t("title")}
         </h1>
       </div>
 
       {/* Category Tabs */}
       <div className="flex flex-wrap gap-1 mb-4 border-b border-border">
-        {jobCategories.map((category) => (
+        {categoryKeys.map((category) => (
           <button
             key={category}
             onClick={() => setActiveCategory(category)}
@@ -118,7 +121,7 @@ export default function TrendingJobs() {
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            {category}
+            {t(`categories.${category}`)}
           </button>
         ))}
       </div>

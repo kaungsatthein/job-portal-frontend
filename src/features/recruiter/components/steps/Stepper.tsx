@@ -1,6 +1,15 @@
 import { CheckCircle2 } from "lucide-react";
 
-const Stepper = ({ step }: { step: number }) => {
+type StepperProps = {
+  step: number;
+  labels: {
+    position: string;
+    details: string;
+    review: string;
+  };
+};
+
+const Stepper = ({ step, labels }: StepperProps) => {
   return (
     <div className="my-4">
       <div className="flex items-center justify-center gap-2">
@@ -29,10 +38,10 @@ const Stepper = ({ step }: { step: number }) => {
               }`}
             >
               {stepNumber === 1
-                ? "Position"
+                ? labels.position
                 : stepNumber === 2
-                ? "Details"
-                : "Review"}
+                ? labels.details
+                : labels.review}
             </span>
             {index < 2 && <div className="h-px w-8 sm:w-16 bg-border" />}
           </div>

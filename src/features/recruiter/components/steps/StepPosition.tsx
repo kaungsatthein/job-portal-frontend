@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -16,7 +19,22 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Building2, Plus } from "lucide-react";
-import { Controller } from "react-hook-form";
+import {
+  Control,
+  Controller,
+  FieldErrors,
+  UseFormRegister,
+} from "react-hook-form";
+import { CompanyOption, JobFormValues } from "../../types/jobs.type";
+
+type StepPositionProps = {
+  register: UseFormRegister<JobFormValues>;
+  errors: FieldErrors<JobFormValues>;
+  control: Control<JobFormValues>;
+  setTab: (tab: string) => void;
+  selectedCompany?: CompanyOption;
+  mockCompanies: CompanyOption[];
+};
 
 const StepPosition = ({
   register,
@@ -25,23 +43,24 @@ const StepPosition = ({
   setTab,
   selectedCompany,
   mockCompanies,
-}: any) => {
+}: StepPositionProps) => {
+  const t = useTranslations("PostJob");
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Position Information</CardTitle>
-        <CardDescription>
-          Enter the job title and select your company
-        </CardDescription>
+        <CardTitle>{t("stepPosition.title")}</CardTitle>
+        <CardDescription>{t("stepPosition.description")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex flex-col">
           <label className="mb-1 font-medium text-sm">
-            Position <span className="text-destructive">*</span>
+            {t("stepPosition.positionLabel")}{" "}
+            <span className="text-destructive">*</span>
           </label>
           <Input
             id="title"
-            placeholder="e.g. Senior Software Engineer"
+            placeholder={t("stepPosition.positionPlaceholder")}
             {...register("title")}
             aria-invalid={!!errors.title}
           />
@@ -53,7 +72,8 @@ const StepPosition = ({
         {/* Company */}
         <div className="flex flex-col">
           <label className="mb-1 font-medium text-sm">
-            Company <span className="text-destructive">*</span>
+            {t("stepPosition.companyLabel")}{" "}
+            <span className="text-destructive">*</span>
           </label>
           <Dialog>
             <DialogTrigger asChild>
@@ -63,19 +83,21 @@ const StepPosition = ({
                 className="w-full justify-start text-left font-normal bg-transparent"
                 id="company"
               >
-                {selectedCompany ? selectedCompany.name : "Select a company"}
+                {selectedCompany
+                  ? selectedCompany.name
+                  : t("stepPosition.selectCompany")}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Select Company</DialogTitle>
+                <DialogTitle>{t("stepPosition.selectCompanyTitle")}</DialogTitle>
                 <DialogDescription>
-                  Choose the company for this job posting
+                  {t("stepPosition.selectCompanyDescription")}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-3 py-4">
                 {mockCompanies.length > 0 ? (
-                  mockCompanies.map((company: any) => (
+                  mockCompanies.map((company) => (
                     <Controller
                       key={company.id}
                       name="companyId"
@@ -98,16 +120,17 @@ const StepPosition = ({
                     />
                   ))
                 ) : (
-                  // <></>
                   <div className="text-center py-8 space-y-4">
-                    <p className="text-muted-foreground">No companies found</p>
+                    <p className="text-muted-foreground">
+                      {t("stepPosition.noCompanies")}
+                    </p>
                     <Button
                       type="button"
                       onClick={() => setTab("myCompany")}
                       className="gap-2"
                     >
                       <Plus className="size-4" />
-                      Create Company
+                      {t("stepPosition.createCompany")}
                     </Button>
                   </div>
                 )}
@@ -121,7 +144,7 @@ const StepPosition = ({
                     onClick={() => setTab("myCompany")}
                   >
                     <Plus className="size-4" />
-                    Create New Company
+                    {t("stepPosition.createNewCompany")}
                   </Button>
                 </div>
               )}

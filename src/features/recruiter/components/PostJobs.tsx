@@ -1,19 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { step1Schema, step2Schema } from "../schema/jobs";
-import { JobFormValues } from "../types/jobs.type";
+import { createStep1Schema, createStep2Schema } from "../schema/jobs";
+import { CompanyOption, JobFormValues } from "../types/jobs.type";
 import StepPosition from "./steps/StepPosition";
 import Stepper from "./steps/Stepper";
 import StepReview from "./steps/StepReview";
 import StepDetail from "./steps/StepDetail";
 import { showToast } from "@/lib";
+import { useTranslations } from "next-intl";
+import { AnyObjectSchema } from "yup";
 
-const mockCompanies = [
+const mockCompanies: CompanyOption[] = [
   { id: "1", name: "Tech Corp" },
   { id: "2", name: "Innovation Labs" },
   { id: "3", name: "Digital Solutions Inc" },
@@ -22,6 +24,15 @@ const mockCompanies = [
 const PostJobs = ({ setTab }: { setTab: (tab: string) => void }) => {
   const router = useRouter();
   const [step, setStep] = useState(1);
+  const t = useTranslations("PostJob");
+  const step1Schema = useMemo<AnyObjectSchema>(
+    () => createStep1Schema(t),
+    [t]
+  );
+  const step2Schema = useMemo<AnyObjectSchema>(
+    () => createStep2Schema(t),
+    [t]
+  );
 
   const {
     register,
@@ -31,7 +42,7 @@ const PostJobs = ({ setTab }: { setTab: (tab: string) => void }) => {
     trigger,
     formState: { errors },
   } = useForm<JobFormValues>({
-    resolver: yupResolver(step === 1 ? (step1Schema as any) : step2Schema),
+    resolver: yupResolver(step === 1 ? step1Schema : step2Schema),
     mode: "onChange",
     defaultValues: {
       title: "",
@@ -45,7 +56,7 @@ const PostJobs = ({ setTab }: { setTab: (tab: string) => void }) => {
 
   const formValues = watch();
   const selectedCompany = mockCompanies.find(
-    (c) => c.id === formValues.companyId
+    (company) => company.id === formValues.companyId
   );
 
   const handleNext = async () => {
@@ -61,13 +72,20 @@ const PostJobs = ({ setTab }: { setTab: (tab: string) => void }) => {
   const onSubmit = (data: JobFormValues) => {
     console.log("Job created:", data);
     // alert("Job posted successfully!");
-    showToast("success", "Your job is undering admin's approval.");
+    showToast("success", t("toast.created"));
   };
 
   return (
     <div>
       {/* Stepper Progress */}
-      <Stepper step={step} />
+      <Stepper
+        step={step}
+        labels={{
+          position: t("stepper.position"),
+          details: t("stepper.details"),
+          review: t("stepper.review"),
+        }}
+      />
 
       {/* Form */}
       <form>
@@ -101,16 +119,16 @@ const PostJobs = ({ setTab }: { setTab: (tab: string) => void }) => {
             onClick={() => setStep(step - 1)}
             disabled={step === 1}
           >
-            Back
+            {t("actions.back")}
           </Button>
 
           {step < 3 ? (
             <Button type="button" onClick={handleNext}>
-              Next
+              {t("actions.next")}
             </Button>
           ) : (
             <Button type="button" onClick={handleSubmit(onSubmit)}>
-              Post Job
+              {t("actions.post")}
             </Button>
           )}
         </div>

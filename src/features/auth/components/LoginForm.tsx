@@ -15,14 +15,14 @@ import { useTranslations } from "next-intl";
 import { showToast } from "@/lib";
 
 const LoginForm = () => {
-  const t = useTranslations("Navigation");
+  const t = useTranslations("Auth");
   const [isRecruiter, setIsRecruiter] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoggedIn(true);
-    showToast("success", "Logged in successfully!");
+    showToast("success", t("loginSuccess"));
   };
 
   if (isLoggedIn) {
@@ -45,23 +45,25 @@ const LoginForm = () => {
   return (
     <Dialog>
       <DialogTrigger className="text-sm font-semibold px-2 py-1 cursor-pointer">
-        {t("Login")}
+        {t("login")}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            Login as Job {isRecruiter ? "Recruiter" : "Researcher"}
+            {t("loginAs", {
+              role: t(isRecruiter ? "roleRecruiter" : "roleResearcher"),
+            })}
           </DialogTitle>
         </DialogHeader>
         <form className="flex flex-col gap-4 mt-3" onSubmit={handleLogin}>
           <input
             type="text"
-            placeholder="Username"
+            placeholder={t("username")}
             className="border rounded px-3 py-2"
           />
           <input
             type="password"
-            placeholder="Password"
+            placeholder={t("password")}
             className="border rounded px-3 py-2"
           />
 
@@ -72,19 +74,21 @@ const LoginForm = () => {
               onChange={() => setIsRecruiter((prev) => !prev)}
             />
             <span>
-              Recruiter{" "}
+              {t("recruiterCheckbox")}{" "}
               <span className="text-xs text-muted-foreground">
-                (If you are a recruiter, you must need to check this box.)
+                {t("recruiterHint")}
               </span>
             </span>
           </div>
 
           <Button type="submit" className="w-full">
-            Login
+            {t("loginButton")}
           </Button>
           <div className="flex items-center my-2">
             <div className="flex-grow border-t" />
-            <span className="mx-2 text-xs text-muted-foreground">or</span>
+            <span className="mx-2 text-xs text-muted-foreground">
+              {t("or")}
+            </span>
             <div className="flex-grow border-t" />
           </div>
           <Button
@@ -93,7 +97,7 @@ const LoginForm = () => {
             className="w-full flex items-center justify-center gap-2"
           >
             <ScanFace />
-            Login with Google
+            {t("loginWithGoogle")}
           </Button>
         </form>
       </DialogContent>

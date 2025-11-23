@@ -2,11 +2,169 @@
   "Navigation": {
     "Login": "လော့ဂ်အင်"
   },
+  "Auth": {
+    "login": "လော့ဂ်အင်",
+    "loginAs": "အလုပ် {role} အဖြစ် လော့ဂ်အင်လုပ်ရန်",
+    "roleRecruiter": "အလုပ်ခေါ်ယူသူ",
+    "roleResearcher": "အလုပ်ရှာဖွေသူ",
+    "username": "အသုံးပြုသူအမည်",
+    "password": "စကားဝှက်",
+    "recruiterCheckbox": "အလုပ်ခေါ်ယူသူ",
+    "recruiterHint": "အလုပ်ခေါ်ယူသူဖြစ်ပါက ဤအမှတ်အသားကို ရွေးချယ်ပါ။",
+    "loginButton": "လော့ဂ်အင်",
+    "or": "သို့မဟုတ်",
+    "loginWithGoogle": "Google ဖြင့် လော့ဂ်အင်လုပ်မည်",
+    "loginSuccess": "လော့ဂ်အင် အောင်မြင်ပါသည်။"
+  },
+  "Home": {
+    "searchPrompt": "အလုပ် <count>{value}</count> ခုကို ယခုပဲ ရှာဖွေပါ"
+  },
+  "TrendingJobs": {
+    "title": "လူကြိုက်အလုပ်များကို ရှာဖွေပါ",
+    "categories": {
+      "popular": "ပေါ်ပေါက်နေသော ရှာဖွေမှုများ",
+      "roles": "ရာထူးများ",
+      "locations": "တည်နေရာများ",
+      "companies": "ကုမ္ပဏီများ",
+      "types": "အလုပ်အမျိုးအစားများ"
+    }
+  },
   "JobSearchBar": {
     "what": "အလုပ်အမျိုးအစား",
     "where": "တည်နေရာ",
     "whatPlaceholder": "အလုပ်အမည်၊ ကုမ္ပဏီ၊ စကားစု",
     "wherePlaceholder": "မြို့၊ တနယ်၊ နယ်မြေ",
     "search": "အလုပ်ရှာဖွေရန်"
+  },
+  "JobCard": {
+    "new": "သင့်အတွက် အသစ်",
+    "save": "သိမ်းဆည်း",
+    "posted": "တင်ခဲ့သည့်အချိန် {time}"
+  },
+  "JobFilter": {
+    "sortBy": "စီစဉ်ခြင်း:",
+    "relevance": "ဆက်စပ်မှု",
+    "date": "ရက်စွဲ",
+    "jobType": "အလုပ်အမျိုးအစား",
+    "fullTime": "အမြဲတမ်း",
+    "partTime": "အချိန်ပိုင်း",
+    "contract": "စာချုပ်",
+    "internship": "လက်တွေ့လေ့ကျင့်",
+    "listedDate": "တင်သည့် ရက်စွဲ",
+    "last24h": "နာရီ ၂၄ အတွင်း",
+    "last3d": "၃ ရက်အတွင်း",
+    "last7d": "၇ ရက်အတွင်း",
+    "last30d": "၃၀ ရက်အတွင်း",
+    "reset": "စစ်ထုတ်မှုများအားလုံး ပြန်သတ်မှတ်"
+  },
+  "JobList": {
+    "available": "ရရှိနိုင်သော အလုပ်များ",
+    "selectPrompt": "အသေးစိတ်ကြည့်ရန် အလုပ်တစ်ခု ရွေးပါ"
+  },
+  "JobDetail": {
+    "posted": "တင်ခဲ့သည့်အချိန် {time}",
+    "payRange": "လစာ အကျယ်အဝန်း",
+    "workingHours": "အလုပ်ချိန်",
+    "experienceRequired": "အတွေ့အကြုံ လိုအပ်ချက်",
+    "jobDescription": "အလုပ်အကြောင်းအရာ",
+    "saveJob": "အလုပ် သိမ်းဆည်းရန်",
+    "applyNow": "ချက်ချင်း လျှောက်ထားရန်"
+  },
+  "Recruiter": {
+    "title": "အလုပ်ခေါ်ယူသူ ဒက်ရှ်ဘုတ်",
+    "subtitle": "သင့်အလုပ်များ၊ ပို့စ်များနှင့် အကောင့်များကို စီမံပါ",
+    "tabs": {
+      "myJobs": "အလုပ်များ",
+      "create": "အသစ် ဖန်တီးရန်",
+      "company": "ကုမ္ပဏီ",
+      "account": "အကောင့်"
+    }
+  },
+  "PostJob": {
+    "actions": {
+      "back": "နောက်သို့",
+      "next": "ရှေ့သို့",
+      "post": "အလုပ် ပို့စ်လုပ်မည်"
+    },
+    "toast": {
+      "created": "သင့်အလုပ်သည် အက်ဒမင်အတည်ပြုရန် စောင့်ဆိုင်းနေသည်။"
+    },
+    "validation": {
+      "title": "အလုပ်အမည် ဖြည့်ရန် လိုအပ်သည်",
+      "company": "ကုမ္ပဏီတစ်ခု ရွေးချယ်ပါ",
+      "description": "အလုပ်အကြောင်းအရာ ဖြည့်ရန် လိုအပ်သည်",
+      "jobType": "အလုပ်အမျိုးအစား ရွေးချယ်ရန် လိုအပ်သည်"
+    },
+    "stepper": {
+      "position": "ရာထူး",
+      "details": "အသေးစိတ်",
+      "review": "သုံးသပ်"
+    },
+    "stepPosition": {
+      "title": "ရာထူးဆိုင်ရာ အချက်အလက်",
+      "description": "အလုပ်အမည်ကို ထည့်ပြီး သင့်ကုမ္ပဏီကို ရွေးချယ်ပါ",
+      "positionLabel": "ရာထူး",
+      "positionPlaceholder": "ဥပမာ Senior Software Engineer",
+      "companyLabel": "ကုမ္ပဏီ",
+      "selectCompany": "ကုမ္ပဏီတစ်ခု ရွေးချယ်ပါ",
+      "selectCompanyTitle": "ကုမ္ပဏီ ရွေးချယ်ပါ",
+      "selectCompanyDescription": "ဤအလုပ်ဖေါ်ပြချက်အတွက် ကုမ္ပဏီကို ရွေးပါ",
+      "noCompanies": "ကုမ္ပဏီ မတွေ့ရှိပါ",
+      "createCompany": "ကုမ္ပဏီ ဖန်တီးရန်",
+      "createNewCompany": "ကုမ္ပဏီအသစ် ဖန်တီးရန်"
+    },
+    "stepDetail": {
+      "title": "အလုပ် အသေးစိတ်",
+      "description": "ရာထူးအတွက် အသေးစိတ် အချက်အလက်များ ပေးပါ",
+      "jobTypeLabel": "အလုပ်အမျိုးအစား",
+      "jobTypePlaceholder": "အလုပ်အမျိုးအစား ရွေးချယ်ပါ",
+      "jobTypeOptions": {
+        "fullTime": "အမြဲတမ်း",
+        "partTime": "အချိန်ပိုင်း",
+        "contract": "စာချုပ်",
+        "internship": "လက်တွေ့လေ့ကျင့်",
+        "remote": "အဝေးမှ"
+      },
+      "locationLabel": "တည်နေရာ",
+      "locationPlaceholder": "ဥပမာ စန်ဖရန်စစ္စကို သို့မဟုတ် Remote",
+      "salaryLabel": "လစာအကျယ်အဝန်း",
+      "salaryPlaceholder": "ဥပမာ $120,000 - $150,000",
+      "descriptionLabel": "အလုပ်အကြောင်းအရာ",
+      "descriptionPlaceholder": "တာဝန်၊ မျှော်မှန်းချက်များ စသည်ကို ဖော်ပြပါ..."
+    },
+    "stepReview": {
+      "title": "သင့်အလုပ် ဖော်ပြချက်ကို ပြန်လည်သုံးသပ်ပါ",
+      "description": "တင်မီ အသေးစိတ်များကို ပြန်လည်စစ်ဆေးပါ",
+      "jobDescription": "အလုပ်အကြောင်းအရာ",
+      "untitled": "အမည်မဲ့ ရာထူး",
+      "noDescription": "ဖော်ပြချက် မထည့်ရသေးပါ"
+    }
+  },
+  "Company": {
+    "title": "သင့်ကုမ္ပဏီကို ဖန်တီးပါ",
+    "nameLabel": "ကုမ္ပဏီအမည်",
+    "namePlaceholder": "သင့်ကုမ္ပဏီအမည်ကို ထည့်ပါ",
+    "industryLabel": "လုပ်ငန်းအမျိုးအစား",
+    "industryPlaceholder": "လုပ်ငန်းအမျိုးအစား ရွေးချယ်ပါ",
+    "submit": "သင့်ကုမ္ပဏီကို ဖန်တီးပါ",
+    "toastSuccess": "သင့်ကုမ္ပဏီကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ။",
+    "industries": {
+      "technology": "နည်းပညာ",
+      "finance": "ဘဏ္ဍာရေး",
+      "healthcare": "ကျန်းမာရေး",
+      "education": "ပညာရေး"
+    },
+    "validation": {
+      "name": "ကုမ္ပဏီအမည် ဖြည့်ရန် လိုအပ်သည်",
+      "industry": "လုပ်ငန်းအမျိုးအစား ဖြည့်ရန် လိုအပ်သည်"
+    }
+  },
+  "Account": {
+    "username": "အသုံးပြုသူအမည်",
+    "email": "အီးမေးလ်",
+    "logout": "ထွက်ရန်"
+  },
+  "Footer": {
+    "tagline": "အလုပ်အကိုင်များကို အားပေးပြီး အရည်အချင်းရှိသူများကို ချိတ်ဆက်ပေးပါသည်။"
   }
 }

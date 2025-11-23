@@ -1,6 +1,9 @@
 import { JobSearchBar, TrendingJobs } from "@/features/job";
+import { getTranslations } from "next-intl/server";
 
-export default function Home() {
+export default async function Home() {
+  const t = await getTranslations("Home");
+
   return (
     <div className="mx-4 lg:mx-8 flex flex-col items-center">
       <div className="w-full lg:max-w-4xl lg:mt-20">
@@ -8,8 +11,12 @@ export default function Home() {
       </div>
       <div className="mt-6 text-center">
         <span className="text-sm text-muted-foreground">
-          Search <span className="font-bold text-foreground">196,252</span> jobs
-          now
+          {t.rich("searchPrompt", {
+            count: (chunks) => (
+              <span className="font-bold text-foreground">{chunks}</span>
+            ),
+            value: "196,252",
+          })}
         </span>
       </div>
 

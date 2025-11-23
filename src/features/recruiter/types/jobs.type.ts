@@ -11,3 +11,8 @@ export type JobFormStep2 = JobFormStep1 & {
 };
 
 export type JobFormValues = JobFormStep2;
+
+export type CompanyOption = {
+  id: string;
+  name: string;
+};

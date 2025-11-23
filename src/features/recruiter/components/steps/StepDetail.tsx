@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -14,25 +17,38 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FileText } from "lucide-react";
-import { Controller } from "react-hook-form";
+import {
+  Control,
+  Controller,
+  FieldErrors,
+  UseFormRegister,
+} from "react-hook-form";
+import { JobFormValues } from "../../types/jobs.type";
 
-const StepDetail = ({ register, errors, control }: any) => {
+type StepDetailProps = {
+  register: UseFormRegister<JobFormValues>;
+  errors: FieldErrors<JobFormValues>;
+  control: Control<JobFormValues>;
+};
+
+const StepDetail = ({ register, errors, control }: StepDetailProps) => {
+  const t = useTranslations("PostJob");
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FileText className="size-5" />
-          Job Details
+          {t("stepDetail.title")}
         </CardTitle>
-        <CardDescription>
-          Provide detailed information about the position
-        </CardDescription>
+        <CardDescription>{t("stepDetail.description")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Job Type */}
         <div className="flex flex-col">
           <label className="mb-1 font-medium text-sm">
-            Job type <span className="text-destructive">*</span>
+            {t("stepDetail.jobTypeLabel")}{" "}
+            <span className="text-destructive">*</span>
           </label>
           <Controller
             name="jobType"
@@ -40,14 +56,26 @@ const StepDetail = ({ register, errors, control }: any) => {
             render={({ field }) => (
               <Select onValueChange={field.onChange} value={field.value}>
                 <SelectTrigger id="jobType" className="w-full">
-                  <SelectValue placeholder="Select job type" />
+                  <SelectValue
+                    placeholder={t("stepDetail.jobTypePlaceholder")}
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="FULL_TIME">Full Time</SelectItem>
-                  <SelectItem value="PART_TIME">Part Time</SelectItem>
-                  <SelectItem value="CONTRACT">Contract</SelectItem>
-                  <SelectItem value="INTERNSHIP">Internship</SelectItem>
-                  <SelectItem value="REMOTE">Remote</SelectItem>
+                  <SelectItem value="FULL_TIME">
+                    {t("stepDetail.jobTypeOptions.fullTime")}
+                  </SelectItem>
+                  <SelectItem value="PART_TIME">
+                    {t("stepDetail.jobTypeOptions.partTime")}
+                  </SelectItem>
+                  <SelectItem value="CONTRACT">
+                    {t("stepDetail.jobTypeOptions.contract")}
+                  </SelectItem>
+                  <SelectItem value="INTERNSHIP">
+                    {t("stepDetail.jobTypeOptions.internship")}
+                  </SelectItem>
+                  <SelectItem value="REMOTE">
+                    {t("stepDetail.jobTypeOptions.remote")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             )}
@@ -60,11 +88,12 @@ const StepDetail = ({ register, errors, control }: any) => {
         {/* Location */}
         <div className="flex flex-col">
           <label className="mb-1 font-medium text-sm">
-            Location <span className="text-destructive">*</span>
+            {t("stepDetail.locationLabel")}{" "}
+            <span className="text-destructive">*</span>
           </label>
           <Input
             id="location"
-            placeholder="e.g. San Francisco, CA or Remote"
+            placeholder={t("stepDetail.locationPlaceholder")}
             {...register("location")}
           />
         </div>
@@ -72,11 +101,12 @@ const StepDetail = ({ register, errors, control }: any) => {
         {/* Salary */}
         <div className="flex flex-col">
           <label className="mb-1 font-medium text-sm">
-            Salary Range <span className="text-destructive">*</span>
+            {t("stepDetail.salaryLabel")}{" "}
+            <span className="text-destructive">*</span>
           </label>
           <Input
             id="salaryRange"
-            placeholder="e.g. $120,000 - $150,000"
+            placeholder={t("stepDetail.salaryPlaceholder")}
             {...register("salaryRange")}
           />
         </div>
@@ -84,11 +114,12 @@ const StepDetail = ({ register, errors, control }: any) => {
         {/* Description */}
         <div className="flex flex-col">
           <label className="mb-1 font-medium text-sm">
-            Job Description <span className="text-destructive">*</span>
+            {t("stepDetail.descriptionLabel")}{" "}
+            <span className="text-destructive">*</span>
           </label>
           <textarea
             id="description"
-            placeholder="Describe the role, responsibilities, requirements..."
+            placeholder={t("stepDetail.descriptionPlaceholder")}
             className="min-h-64 border rounded-md p-3"
             {...register("description")}
           />

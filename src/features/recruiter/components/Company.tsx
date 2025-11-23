@@ -2,8 +2,9 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useForm, Controller } from "react-hook-form";
-import * as yup from "yup";
-import { companySchema } from "../schema/company";
+import { useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { createCompanySchema } from "../schema/company";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { showToast } from "@/lib";
 import { Button } from "@/components/ui/button";
@@ -15,17 +16,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type CompanyFormValues = yup.InferType<typeof companySchema>;
+type CompanyFormValues = {
+  name: string;
+  industry: string;
+};
 
 // Demo industries (replace with API call later)
 const demoIndustries = [
-  { id: 1, name: "Technology" },
-  { id: 2, name: "Finance" },
-  { id: 3, name: "Healthcare" },
-  { id: 4, name: "Education" },
+  { id: "technology" },
+  { id: "finance" },
+  { id: "healthcare" },
+  { id: "education" },
 ];
 
 const Company = () => {
+  const t = useTranslations("Company");
+  const companySchema = useMemo(() => createCompanySchema(t), [t]);
   const {
     register,
     handleSubmit,
@@ -41,7 +47,7 @@ const Company = () => {
 
   const onSubmit = (data: CompanyFormValues) => {
     console.log("Company created:", data);
-    showToast("success", "Your company is successfully created.");
+    showToast("success", t("toastSuccess"));
     reset();
   };
 
@@ -49,17 +55,19 @@ const Company = () => {
     <Card>
       <CardHeader>
         <h1 className="text-md font-semibold text-foreground">
-          Create Your Company
+          {t("title")}
         </h1>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="flex flex-col">
-            <label className="mb-1 font-medium text-sm">Company Name</label>
+            <label className="mb-1 font-medium text-sm">
+              {t("nameLabel")}
+            </label>
             <input
               {...register("name")}
               type="text"
-              placeholder="Enter your company name"
+              placeholder={t("namePlaceholder")}
               className="border p-2 rounded"
             />
             {errors.name && (
@@ -68,19 +76,21 @@ const Company = () => {
           </div>
 
           <div className="flex flex-col">
-            <label className="mb-1 font-medium text-sm">Industry</label>
+            <label className="mb-1 font-medium text-sm">
+              {t("industryLabel")}
+            </label>
             <Controller
               name="industry"
               control={control}
               render={({ field }) => (
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger className="w-full border p-2 rounded">
-                    <SelectValue placeholder="Select industry" />
+                    <SelectValue placeholder={t("industryPlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
                     {demoIndustries.map((industry) => (
-                      <SelectItem key={industry.id} value={industry.name}>
-                        {industry.name}
+                      <SelectItem key={industry.id} value={industry.id}>
+                        {t(`industries.${industry.id}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -95,7 +105,7 @@ const Company = () => {
           </div>
 
           <Button type="submit" className="w-full">
-            Create Your Company
+            {t("submit")}
           </Button>
         </form>
       </CardContent>

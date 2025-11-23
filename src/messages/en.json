@@ -2,11 +2,169 @@
   "Navigation": {
     "Login": "Login"
   },
+  "Auth": {
+    "login": "Login",
+    "loginAs": "Login as Job {role}",
+    "roleRecruiter": "Recruiter",
+    "roleResearcher": "Researcher",
+    "username": "Username",
+    "password": "Password",
+    "recruiterCheckbox": "Recruiter",
+    "recruiterHint": "(If you are a recruiter, you must need to check this box.)",
+    "loginButton": "Login",
+    "or": "or",
+    "loginWithGoogle": "Login with Google",
+    "loginSuccess": "Logged in successfully!"
+  },
+  "Home": {
+    "searchPrompt": "Search <count>{value}</count> jobs now"
+  },
+  "TrendingJobs": {
+    "title": "Discover trending jobs",
+    "categories": {
+      "popular": "Popular searches",
+      "roles": "Role titles",
+      "locations": "Locations",
+      "companies": "Companies",
+      "types": "Job types"
+    }
+  },
   "JobSearchBar": {
     "what": "What",
     "where": "Where",
     "whatPlaceholder": "Job title, company, keyword",
     "wherePlaceholder": "City, district, state",
     "search": "Search jobs"
+  },
+  "JobCard": {
+    "new": "New to you",
+    "save": "Save",
+    "posted": "Posted {time}"
+  },
+  "JobFilter": {
+    "sortBy": "Sort by:",
+    "relevance": "Relevance",
+    "date": "Date",
+    "jobType": "Job type",
+    "fullTime": "Full-time",
+    "partTime": "Part-time",
+    "contract": "Contract",
+    "internship": "Internship",
+    "listedDate": "Listed date",
+    "last24h": "Last 24 hours",
+    "last3d": "Last 3 days",
+    "last7d": "Last 7 days",
+    "last30d": "Last 30 days",
+    "reset": "Reset all filters"
+  },
+  "JobList": {
+    "available": "Available Jobs",
+    "selectPrompt": "Select a job to view details"
+  },
+  "JobDetail": {
+    "posted": "Posted {time}",
+    "payRange": "Pay Range",
+    "workingHours": "Working Hours",
+    "experienceRequired": "Experience Required",
+    "jobDescription": "Job Description",
+    "saveJob": "Save Job",
+    "applyNow": "Apply Now"
+  },
+  "Recruiter": {
+    "title": "Recruiter Dashboard",
+    "subtitle": "Manage your jobs, posts, and accounts",
+    "tabs": {
+      "myJobs": "My Jobs",
+      "create": "Create",
+      "company": "Company",
+      "account": "Account"
+    }
+  },
+  "PostJob": {
+    "actions": {
+      "back": "Back",
+      "next": "Next",
+      "post": "Post Job"
+    },
+    "toast": {
+      "created": "Your job is under admin review."
+    },
+    "validation": {
+      "title": "Job title is required",
+      "company": "Please select a company",
+      "description": "Job description is required",
+      "jobType": "Job type is required"
+    },
+    "stepper": {
+      "position": "Position",
+      "details": "Details",
+      "review": "Review"
+    },
+    "stepPosition": {
+      "title": "Position Information",
+      "description": "Enter the job title and select your company",
+      "positionLabel": "Position",
+      "positionPlaceholder": "e.g. Senior Software Engineer",
+      "companyLabel": "Company",
+      "selectCompany": "Select a company",
+      "selectCompanyTitle": "Select Company",
+      "selectCompanyDescription": "Choose the company for this job posting",
+      "noCompanies": "No companies found",
+      "createCompany": "Create Company",
+      "createNewCompany": "Create New Company"
+    },
+    "stepDetail": {
+      "title": "Job Details",
+      "description": "Provide detailed information about the position",
+      "jobTypeLabel": "Job type",
+      "jobTypePlaceholder": "Select job type",
+      "jobTypeOptions": {
+        "fullTime": "Full Time",
+        "partTime": "Part Time",
+        "contract": "Contract",
+        "internship": "Internship",
+        "remote": "Remote"
+      },
+      "locationLabel": "Location",
+      "locationPlaceholder": "e.g. San Francisco, CA or Remote",
+      "salaryLabel": "Salary Range",
+      "salaryPlaceholder": "e.g. $120,000 - $150,000",
+      "descriptionLabel": "Job Description",
+      "descriptionPlaceholder": "Describe the role, responsibilities, requirements..."
+    },
+    "stepReview": {
+      "title": "Review Your Job Posting",
+      "description": "Please review the details before publishing",
+      "jobDescription": "Job Description",
+      "untitled": "Untitled Position",
+      "noDescription": "No description provided"
+    }
+  },
+  "Company": {
+    "title": "Create Your Company",
+    "nameLabel": "Company Name",
+    "namePlaceholder": "Enter your company name",
+    "industryLabel": "Industry",
+    "industryPlaceholder": "Select industry",
+    "submit": "Create Your Company",
+    "toastSuccess": "Your company is successfully created.",
+    "industries": {
+      "technology": "Technology",
+      "finance": "Finance",
+      "healthcare": "Healthcare",
+      "education": "Education"
+    },
+    "validation": {
+      "name": "Company name is required",
+      "industry": "Industry is required"
+    }
+  },
+  "Account": {
+    "username": "Username",
+    "email": "Email",
+    "logout": "Logout"
+  },
+  "Footer": {
+    "tagline": "Empowering Careers, Connecting Talent."
   }
 }

@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type SortOption = "relevance" | "date";
 type JobType = "all" | "full-time" | "part-time" | "contract" | "internship";
@@ -18,6 +19,7 @@ export function JobFilter() {
   const [sortBy, setSortBy] = useState<SortOption>("relevance");
   const [jobType, setJobType] = useState<JobType>("all");
   const [listedDate, setListedDate] = useState<ListedDate>("all");
+  const t = useTranslations("JobFilter");
 
   const resetFilters = () => {
     setSortBy("relevance");
@@ -26,26 +28,26 @@ export function JobFilter() {
   };
 
   const jobTypeLabels: Record<JobType, string> = {
-    all: "Job type",
-    "full-time": "Full-time",
-    "part-time": "Part-time",
-    contract: "Contract",
-    internship: "Internship",
+    all: t("jobType"),
+    "full-time": t("fullTime"),
+    "part-time": t("partTime"),
+    contract: t("contract"),
+    internship: t("internship"),
   };
 
   const listedDateLabels: Record<ListedDate, string> = {
-    all: "Listed date",
-    "24h": "Last 24 hours",
-    "3d": "Last 3 days",
-    "7d": "Last 7 days",
-    "30d": "Last 30 days",
+    all: t("listedDate"),
+    "24h": t("last24h"),
+    "3d": t("last3d"),
+    "7d": t("last7d"),
+    "30d": t("last30d"),
   };
 
   return (
     <div className="flex items-center gap-2">
       {/* Sort by section */}
       <div className="flex items-center">
-        <span className="text-sm  text-foreground">Sort by:</span>
+        <span className="text-sm  text-foreground">{t("sortBy")}</span>
         <div className="flex items-center">
           <Button
             variant={"link"}
@@ -57,7 +59,7 @@ export function JobFilter() {
                 : "text-muted-foreground/50"
             }`}
           >
-            Relevance
+            {t("relevance")}
           </Button>
           <span className="text-muted-foreground">/</span>
           <Button
@@ -68,7 +70,7 @@ export function JobFilter() {
               sortBy === "date" ? "text-primary" : "text-muted-foreground/50"
             }`}
           >
-            Date
+            {t("date")}
           </Button>
         </div>
       </div>
@@ -123,7 +125,7 @@ export function JobFilter() {
 
       {/* Reset filters */}
       <Button variant="link" onClick={resetFilters} className="py-0 px-1">
-        Reset all filters
+        {t("reset")}
       </Button>
     </div>
   );

@@ -6,25 +6,25 @@ import PostJobs from "./PostJobs";
 import Account from "./Account";
 import Company from "./Company";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 const RecruiterScreen = () => {
   const [tab, setTab] = useState("myJobs");
+  const t = useTranslations("Recruiter");
   return (
     <div className="mx-4 lg:mx-8">
       <div>
         <h1 className="text-lg font-semibold text-foreground">
-          Recruiter Dashboard
+          {t("title")}
         </h1>
-        <span className="text-muted-foreground text-sm">
-          Manage your jobs, posts, and accounts
-        </span>
+        <span className="text-muted-foreground text-sm">{t("subtitle")}</span>
       </div>
       <Tabs value={tab} onValueChange={setTab} className="w-full my-6">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="myJobs">My Jobs</TabsTrigger>
-          <TabsTrigger value="postJobs">Create</TabsTrigger>
-          <TabsTrigger value="myCompany">Company</TabsTrigger>
-          <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="myJobs">{t("tabs.myJobs")}</TabsTrigger>
+          <TabsTrigger value="postJobs">{t("tabs.create")}</TabsTrigger>
+          <TabsTrigger value="myCompany">{t("tabs.company")}</TabsTrigger>
+          <TabsTrigger value="account">{t("tabs.account")}</TabsTrigger>
         </TabsList>
         <TabsContent value="myJobs" className="mt-3">
           <MyJobs />

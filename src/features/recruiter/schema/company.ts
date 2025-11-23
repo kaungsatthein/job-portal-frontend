@@ -1,6 +1,9 @@
 import * as yup from "yup";
 
-export const companySchema = yup.object({
-  name: yup.string().required("Company name is required"),
-  industry: yup.string().required("Industry is required"),
-});
+type Translator = (key: string) => string;
+
+export const createCompanySchema = (t: Translator) =>
+  yup.object({
+    name: yup.string().required(t("validation.name")),
+    industry: yup.string().required(t("validation.industry")),
+  });
