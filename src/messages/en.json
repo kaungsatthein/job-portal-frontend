@@ -39,7 +39,11 @@
   "JobCard": {
     "new": "New to you",
     "save": "Save",
-    "posted": "Posted {time}"
+    "posted": "Posted {time}",
+    "jobTypeLabel": "Job type",
+    "salaryLabel": "Salary",
+    "locationLabel": "Location",
+    "applications": "{count, plural, one {# applicant} other {# applicants}}"
   },
   "JobFilter": {
     "sortBy": "Sort by:",

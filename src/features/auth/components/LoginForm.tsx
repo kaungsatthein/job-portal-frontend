@@ -9,20 +9,52 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useState } from "react";
-import { ScanFace, Bell, ChevronDown } from "lucide-react";
+import {
+  ScanFace,
+  Bell,
+  ChevronDown,
+  User,
+  FileText,
+  LogOut,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTranslations } from "next-intl";
 import { showToast } from "@/lib";
+import { useGoogleLogin } from "@/features/auth/queries/auth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const LoginForm = () => {
   const t = useTranslations("Auth");
   const [isRecruiter, setIsRecruiter] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { mutate: loginWithGoogle, isPending: isGoogleLoginPending } =
+    useGoogleLogin();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoggedIn(true);
     showToast("success", t("loginSuccess"));
+  };
+
+  const handleGoogleLogin = () => {
+    const selectedRole = isRecruiter ? "recruiter" : "researcher";
+    const res = loginWithGoogle(selectedRole);
+    console.log("res :>> ", res);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    showToast("success", "Logged out successfully");
+  };
+
+  const handleMenuSelect = (message: string) => {
+    showToast("info", message);
   };
 
   if (isLoggedIn) {
@@ -31,13 +63,39 @@ const LoginForm = () => {
         <Button variant="ghost" size="icon" className="cursor-pointer">
           <Bell />
         </Button>
-        <div className="relative cursor-pointer">
-          <Avatar className="w-6 h-6">
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <ChevronDown className="absolute -bottom-1 -right-1 w-3 h-3 bg-background rounded-full border" />
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <div className="relative cursor-pointer">
+              <Avatar className="w-6 h-6">
+                <AvatarImage
+                  src="https://github.com/shadcn.png"
+                  alt="@shadcn"
+                />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+              <ChevronDown className="absolute -bottom-1 -right-1 w-3 h-3 bg-background rounded-full border" />
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem
+              onSelect={() => handleMenuSelect("Navigate to Edit Profile")}
+            >
+              <User className="w-4 h-4" />
+              Edit Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={() => handleMenuSelect("Check application status")}
+            >
+              <FileText className="w-4 h-4" />
+              Application Status
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem variant="destructive" onSelect={handleLogout}>
+              <LogOut className="w-4 h-4" />
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     );
   }
@@ -95,6 +153,8 @@ const LoginForm = () => {
             type="button"
             variant="outline"
             className="w-full flex items-center justify-center gap-2"
+            onClick={handleGoogleLogin}
+            disabled={isGoogleLoginPending}
           >
             <ScanFace />
             {t("loginWithGoogle")}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Job } from "../type";
 import { JobCard } from "./JobCard";
 import { JobDetailCard } from "./JobDetailCard";
@@ -11,16 +11,24 @@ interface JobListProps {
 }
 
 export const JobList = ({ jobs }: JobListProps) => {
-  const [selectedJobId, setSelectedJobId] = useState<number | null>(1);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const t = useTranslations("JobList");
+
+  useEffect(() => {
+    if (jobs.length > 0) {
+      setSelectedJobId(jobs[0].id);
+    } else {
+      setSelectedJobId(null);
+    }
+  }, [jobs]);
 
   const selectedJob = jobs.find((job) => job.id === selectedJobId);
 
   return (
-    <div className="flex gap-2 w-full h-[calc(100vh-4rem)] mb-14">
+    <div className="flex flex-col gap-4 lg:flex-row lg:gap-2 w-full lg:h-[calc(100vh-4rem)] mb-14">
       {/* list */}
-      <div className="w-[40%] h-full overflow-y-auto">
-        <div className="w-full h-[100vh] p-4 pt-0 space-y-2">
+      <div className="w-full lg:w-[40%] lg:h-full overflow-y-auto">
+        <div className="w-full h-[100vh] p-4 pt-0 space-y-2 ">
           <label className="font-semibold text-xl">{t("available")}</label>
           <div className=" mt-2 flex flex-col gap-4">
             {jobs?.map((job) => (
@@ -40,14 +48,12 @@ export const JobList = ({ jobs }: JobListProps) => {
         </div>
       </div>
       {/* list detail */}
-      <div className="w-[58%]">
+      <div className="w-full lg:w-[58%]">
         {selectedJob ? (
           <JobDetailCard job={selectedJob} />
         ) : (
           <div className="flex items-center justify-center rounded-lg border border-border bg-card p-8 text-center">
-            <p className="text-muted-foreground">
-              {t("selectPrompt")}
-            </p>
+            <p className="text-muted-foreground">{t("selectPrompt")}</p>
           </div>
         )}
       </div>

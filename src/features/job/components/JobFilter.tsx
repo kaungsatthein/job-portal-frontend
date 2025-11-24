@@ -44,10 +44,10 @@ export function JobFilter() {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
       {/* Sort by section */}
-      <div className="flex items-center">
-        <span className="text-sm  text-foreground">{t("sortBy")}</span>
+      <div className="flex items-center gap-1">
+        <span className="text-sm text-foreground">{t("sortBy")}</span>
         <div className="flex items-center">
           <Button
             variant={"link"}
@@ -81,7 +81,7 @@ export function JobFilter() {
           <Button
             size={"sm"}
             variant="outline"
-            className="flex items-center rounded-full border-border bg-background hover:bg-accent text-foreground"
+            className="flex items-center justify-between rounded-full border-border bg-background hover:bg-accent text-foreground w-full sm:w-auto"
           >
             {jobTypeLabels[jobType]}
             <ChevronDown className="h-4 w-4" />
@@ -105,7 +105,7 @@ export function JobFilter() {
           <Button
             size={"sm"}
             variant="outline"
-            className="flex items-center  rounded-full border-border bg-background hover:bg-accent text-foreground"
+            className="flex items-center justify-between rounded-full border-border bg-background hover:bg-accent text-foreground w-full sm:w-auto"
           >
             {listedDateLabels[listedDate]}
             <ChevronDown className="h-4 w-4" />
@@ -124,7 +124,11 @@ export function JobFilter() {
       </DropdownMenu>
 
       {/* Reset filters */}
-      <Button variant="link" onClick={resetFilters} className="py-0 px-1">
+      <Button
+        variant="link"
+        onClick={resetFilters}
+        className="py-0 px-1 w-full sm:w-auto"
+      >
         {t("reset")}
       </Button>
     </div>

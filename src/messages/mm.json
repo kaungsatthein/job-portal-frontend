@@ -39,7 +39,11 @@
   "JobCard": {
     "new": "သင့်အတွက် အသစ်",
     "save": "သိမ်းဆည်း",
-    "posted": "တင်ခဲ့သည့်အချိန် {time}"
+    "posted": "တင်ခဲ့သည့်အချိန် {time}",
+    "jobTypeLabel": "အလုပ်အမျိုးအစား",
+    "salaryLabel": "လစာ",
+    "locationLabel": "တည်နေရာ",
+    "applications": "လျှောက်ထားသူ {count} ဦး"
   },
   "JobFilter": {
     "sortBy": "စီစဉ်ခြင်း:",

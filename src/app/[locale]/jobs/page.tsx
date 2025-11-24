@@ -1,68 +1,54 @@
 import { Separator } from "@/components/ui/separator";
 import { JobFilter, JobList, JobSearchBar } from "@/features/job";
+import { fetchJobPostings } from "@/features/job/services/job-postings";
+import { Job, JobPosting } from "@/features/job/type";
 
-export const jobs = [
-  {
-    id: 1,
-    title: "Part-Time Food Taster - Woodlands/ $15 per hour/ Weekday only!",
-    company: "ScienTec Consulting",
-    location: "Woodlands",
-    pay_range: "$15 - $15 per month",
-    job_type: "Part time",
-    experience_required: "No experience required",
-    working_hours: "2pm to 5pm - From Monday to Thursday Only",
-    posted: "23h ago",
-    job_scope: "Participate in...",
-  },
-  {
-    id: 2,
-    title: "Part-Time Food Taster - Woodlands/ $15 per hour/ Weekday only!",
-    company: "ScienTec Consulting",
-    location: "Woodlands",
-    pay_range: "$15 - $15 per month",
-    job_type: "Part time",
-    experience_required: "No experience required",
-    working_hours: "2pm to 5pm - From Monday to Thursday Only",
-    posted: "23h ago",
-    job_scope: "Participate in...",
-  },
-  {
-    id: 3,
-    title: "Part-Time Food Taster - Woodlands/ $15 per hour/ Weekday only!",
-    company: "ScienTec Consulting",
-    location: "Woodlands",
-    pay_range: "$15 - $15 per month",
-    job_type: "Part time",
-    experience_required: "No experience required",
-    working_hours: "2pm to 5pm - From Monday to Thursday Only",
-    posted: "23h ago",
-    job_scope: "Participate in...",
-  },
-  {
-    id: 4,
-    title: "Part-Time Food Taster - Woodlands/ $15 per hour/ Weekday only!",
-    company: "ScienTec Consulting",
-    location: "Woodlands",
-    pay_range: "$15 - $15 per month",
-    job_type: "Part time",
-    experience_required: "No experience required",
-    working_hours: "2pm to 5pm - From Monday to Thursday Only",
-    posted: "23h ago",
-    job_scope: "Participate in...",
-  },
-  {
-    id: 5,
-    title: "Part-Time Food Taster - Woodlands/ $15 per hour/ Weekday only!",
-    company: "ScienTec Consulting",
-    location: "Woodlands",
-    pay_range: "$15 - $15 per month",
-    job_type: "Part time",
-    experience_required: "No experience required",
-    working_hours: "2pm to 5pm - From Monday to Thursday Only",
-    posted: "23h ago",
-    job_scope: "Participate in...",
-  },
-];
+const formatJobType = (jobType: string) => {
+  if (!jobType) return "Not specified";
+  return jobType
+    .replace(/[_-]/g, " ")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase()
+    .replace(/(^|\s)\S/g, (match) => match.toUpperCase());
+};
+
+const formatPostedTime = (createdAt: string) => {
+  const parsedDate = new Date(createdAt);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "Recently";
+  }
+
+  const diffMs = Date.now() - parsedDate.getTime();
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  if (diffHours < 24) {
+    const safeHours = diffHours <= 0 ? 1 : diffHours;
+    return `${safeHours}h ago`;
+  }
+
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 7) {
+    return `${diffDays}d ago`;
+  }
+
+  return parsedDate.toLocaleDateString();
+};
+
+const mapJobPostingToJob = (posting: JobPosting): Job => ({
+  id: posting.id,
+  title: posting.title,
+  company: posting.company?.name || posting.recruiter?.name || "Unknown Company",
+  location: posting.location || "Not specified",
+  pay_range: posting.salaryRange || "Not specified",
+  job_type: formatJobType(posting.jobType),
+  experience_required: "Not specified",
+  working_hours: "Not specified",
+  posted: formatPostedTime(posting.createdAt),
+  job_scope: posting.description || "No description provided.",
+  status: posting.status,
+  companyIndustry: posting.company?.industryId,
+  applicationsCount: posting.applications?.length ?? 0,
+});
 
 export default async function JobsPage({
   searchParams,
@@ -71,6 +57,14 @@ export default async function JobsPage({
 }) {
   const params = await searchParams;
   const { what, where } = params;
+  let jobs: Job[] = [];
+
+  try {
+    const jobPostings = await fetchJobPostings();
+    jobs = jobPostings.map(mapJobPostingToJob);
+  } catch (error) {
+    console.error("Failed to fetch job postings", error);
+  }
 
   return (
     <div className="mt-5">

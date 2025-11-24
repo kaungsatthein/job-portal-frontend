@@ -8,6 +8,7 @@ import { getMessages } from "@/lib";
 import { ToastWrapper } from "@/components/common";
 import NavBar from "@/features/navigation/NavBar";
 import Footer from "@/features/Footer";
+import ReactQueryProvider from "@/lib/common/ReactQueryProvider";
 
 const openSans = Open_Sans({
   subsets: ["latin"],
@@ -48,16 +49,18 @@ export default async function RootLayout({
       >
         <ToastWrapper />
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <NavBar />
-            {children}
-            <Footer />
-          </ThemeProvider>
+          <ReactQueryProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <NavBar />
+              {children}
+              <Footer />
+            </ThemeProvider>
+          </ReactQueryProvider>
         </NextIntlClientProvider>
       </body>
     </html>
