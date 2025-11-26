@@ -4,14 +4,10 @@ import { useState } from "react";
 import { Search, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
+import { useQueryParams } from "../hooks/useQueryParams";
 
-const categoryKeys = [
-  "popular",
-  "roles",
-  "locations",
-  "companies",
-  "types",
-] as const;
+const categoryKeys = ["popular", "roles", "locations", "companies"] as const;
 type CategoryKey = (typeof categoryKeys)[number];
 
 const popularSearches = [
@@ -71,42 +67,42 @@ const companies = [
   "singtel",
 ];
 
-const jobTypes = [
-  "full time",
-  "part time",
-  "contract",
-  "internship",
-  "freelance",
-  "remote",
-  "hybrid",
-  "temporary",
-  "permanent",
-  "consultant",
-];
-
 const categoryData: Record<CategoryKey, string[]> = {
   popular: popularSearches,
   roles: roleTitles,
   locations,
   companies,
-  types: jobTypes,
 };
 
 export default function TrendingJobs() {
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("popular");
   const t = useTranslations("TrendingJobs");
+  const pathname = usePathname();
+  const { push } = useQueryParams();
 
   const currentSearches =
     categoryData[activeCategory as keyof typeof categoryData];
+  const locale = pathname.split("/")[1] || "en";
+  const jobsPath = `/${locale}/jobs`;
+
+  const handleSearchClick = (search: string) => {
+    const term = search.trim();
+    if (!term) return;
+
+    if (activeCategory === "locations") {
+      push(jobsPath, { where: term });
+      return;
+    }
+
+    push(jobsPath, { what: term });
+  };
 
   return (
     <div className="w-full max-w-4xl mx-auto my-30">
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <TrendingUp className="w-4 h-4 text-primary" />
-        <h1 className="text-lg font-semibold text-foreground">
-          {t("title")}
-        </h1>
+        <h1 className="text-lg font-semibold text-foreground">{t("title")}</h1>
       </div>
 
       {/* Category Tabs */}
@@ -134,6 +130,7 @@ export default function TrendingJobs() {
             variant="outline"
             size="sm"
             className=" px-2 py-1 bg-background border border-border hover:bg-muted hover:border-primary/50 transition-colors group"
+            onClick={() => handleSearchClick(search)}
           >
             <Search className="w-2 h-2 text-primary group-hover:text-primary" />
             <span className="text-sm text-foreground">{search}</span>
