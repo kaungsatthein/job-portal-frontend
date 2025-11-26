@@ -74,6 +74,52 @@
     "saveJob": "Save Job",
     "applyNow": "Apply Now"
   },
+  "ApplicationStatus": {
+    "badge": "Application journey",
+    "title": "Application status",
+    "subtitle": "See how recruiters are moving your applications and what you need to do next.",
+    "summary": {
+      "activeLabel": "{count, plural, one {# active application} other {# active applications}}",
+      "updatedLabel": "Synced {time} ago",
+      "awaitingRecruiter": "Waiting on recruiter",
+      "awaitingYou": "Waiting on you",
+      "interviewing": "Interviewing",
+      "offers": "Offers",
+      "items": "items"
+    },
+    "filters": {
+      "all": "All stages"
+    },
+    "stage": {
+      "applied": "Applied",
+      "reviewing": "Reviewing",
+      "interview": "Interviewing",
+      "offer": "Offer",
+      "declined": "Closed"
+    },
+    "waitingOn": "Waiting on {actor}",
+    "nextStep": "Next step",
+    "nextStepDue": "Due {time}",
+    "progress": "Progress",
+    "timeline": {
+      "recruiter": "Recruiter",
+      "researcher": "You",
+      "system": "System",
+      "completed": "Completed",
+      "active": "In progress"
+    },
+    "empty": "No applications in this stage yet.",
+    "back": "Back to all applications",
+    "summaryCard": "Application details",
+    "dialog": {
+      "company": "Company",
+      "recruiter": "Recruiter",
+      "location": "Location",
+      "actions": "Suggested actions",
+      "actionOne": "Confirm the next step and attach any requested files.",
+      "actionTwo": "Message the recruiter if you need to adjust timing."
+    }
+  },
   "Recruiter": {
     "title": "Recruiter Dashboard",
     "subtitle": "Manage your jobs, posts, and accounts",

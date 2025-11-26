@@ -20,7 +20,7 @@ import {
   Users,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { showToast } from "@/lib";
 import { useGoogleLogin } from "@/features/auth/queries/auth";
 import type { LoginRole } from "@/features/auth/services/auth";
@@ -44,6 +44,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 type NotificationCategory = "application" | "interview" | "reminder" | "system";
 
@@ -97,7 +98,9 @@ const notificationTone: Record<
 
 const LoginForm = () => {
   const t = useTranslations("Auth");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const locale = useLocale();
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [cvName, setCvName] = useState<string | null>(null);
   const [profile, setProfile] = useState({
@@ -169,6 +172,10 @@ const LoginForm = () => {
     setIsEditOpen(false);
   };
 
+  const goToApplicationStatus = () => {
+    router.push(`/${locale}/application-status`);
+  };
+
   const unreadCount = useMemo(
     () => notifications.filter((item) => item.unread).length,
     [notifications]
@@ -219,7 +226,7 @@ const LoginForm = () => {
             >
               <Bell />
               {unreadCount > 0 && (
-                <span className="absolute -right-1.5 -top-1.5 grid min-h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[11px] font-semibold leading-none text-primary-foreground">
+                <span className="absolute -right-1 -top-1 grid min-h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
@@ -401,7 +408,7 @@ const LoginForm = () => {
               Edit Profile
             </DropdownMenuItem>
             <DropdownMenuItem
-              onSelect={() => showToast("info", "Check application status")}
+              onSelect={goToApplicationStatus}
             >
               <FileText className="w-4 h-4" />
               Application Status

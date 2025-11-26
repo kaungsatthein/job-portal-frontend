@@ -1,6 +1,7 @@
 import { JobDetailCard } from "@/features/job";
 import { fetchJobPosting } from "@/features/job/services/job-postings";
 import { Job, JobPosting } from "@/features/job/type";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -67,9 +68,10 @@ export default async function JobDetailPage({
       <div className="mx-4 lg:mx-8 my-6 space-y-4">
         <Link
           href={`/${locale}/jobs`}
-          className="inline-flex items-center text-sm text-primary hover:underline"
+          className="inline-flex gap-1 items-center text-sm text-primary hover:underline"
         >
-          Back to jobs
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to jobs</span>
         </Link>
         <JobDetailCard job={job} />
       </div>
