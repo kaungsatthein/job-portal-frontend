@@ -97,6 +97,8 @@
     "appliedAt": "Applied {time}",
     "statusLabel": "Status",
     "noApplicants": "No one has applied yet.",
+    "searchPlaceholder": "Search applicants by name or role",
+    "noSearchResults": "No applicants match your search.",
     "status": {
       "reviewing": "Reviewing",
       "shortlisted": "Shortlisted",

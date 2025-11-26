@@ -97,6 +97,8 @@
     "appliedAt": "{time} တွင် လျှောက်ထားသည်",
     "statusLabel": "အခြေအနေ",
     "noApplicants": "လျှောက်ထားသူ မရှိသေးပါ",
+    "searchPlaceholder": "အမည် သို့မဟုတ် ရာထူး ဖြင့် လျှောက်ထားသူများ ရှာဖွေရန်",
+    "noSearchResults": "သင့်ရှာဖွေမှုနှင့် ကိုက်ညီသော လျှောက်ထားသူ မရှိပါ",
     "status": {
       "reviewing": "စစ်ဆေးဆဲ",
       "shortlisted": "Shortlisted",

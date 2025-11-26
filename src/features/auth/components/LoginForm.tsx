@@ -37,7 +37,7 @@ import { Separator } from "@/components/ui/separator";
 
 const LoginForm = () => {
   const t = useTranslations("Auth");
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [cvName, setCvName] = useState<string | null>(null);
   const [profile, setProfile] = useState({

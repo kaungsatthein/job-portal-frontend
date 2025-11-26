@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -17,7 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Briefcase, Globe2, UploadCloud, Users } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Briefcase, Globe2, Search, UploadCloud, Users } from "lucide-react";
 
 type Applicant = {
   name: string;
@@ -237,6 +238,7 @@ const MyJobs = () => {
   const t = useTranslations("RecruiterMyJobs");
   const [jobs, setJobs] = useState<RecruiterJob[]>(demoJobs);
   const [selectedJob, setSelectedJob] = useState<RecruiterJob | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const initials = (name: string) =>
     name
@@ -250,6 +252,21 @@ const MyJobs = () => {
     () => jobs.reduce((total, job) => total + job.applicants.length, 0),
     [jobs]
   );
+
+  useEffect(() => {
+    setSearchTerm("");
+  }, [selectedJob]);
+
+  const filteredApplicants = useMemo(() => {
+    if (!selectedJob) return [];
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return selectedJob.applicants;
+    return selectedJob.applicants.filter(
+      (applicant) =>
+        applicant.name.toLowerCase().includes(term) ||
+        applicant.role.toLowerCase().includes(term)
+    );
+  }, [searchTerm, selectedJob]);
 
   const handleStatusChange = (
     jobId: string,
@@ -378,13 +395,27 @@ const MyJobs = () => {
                 </Badge>
               </div>
 
+              <div className="flex items-center gap-2">
+                <div className="relative w-full">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder={t("searchPlaceholder")}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+
               <div className="max-h-[50vh] space-y-3 overflow-y-auto pr-1">
-                {selectedJob.applicants.length === 0 ? (
+                {filteredApplicants.length === 0 ? (
                   <div className="flex items-center justify-center rounded-lg border border-dashed border-border px-4 py-8 text-sm text-muted-foreground">
-                    {t("noApplicants")}
+                    {selectedJob.applicants.length === 0
+                      ? t("noApplicants")
+                      : t("noSearchResults")}
                   </div>
                 ) : (
-                  selectedJob.applicants.map((applicant) => (
+                  filteredApplicants.map((applicant) => (
                     <div
                       key={applicant.name}
                       className="flex items-start justify-between gap-3 rounded-xl border border-border/70 bg-card/70 px-3 py-2"
