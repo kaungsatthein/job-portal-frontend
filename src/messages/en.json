@@ -14,7 +14,10 @@
     "loginButton": "Login",
     "or": "or",
     "loginWithGoogle": "Login with Google",
-    "loginSuccess": "Logged in successfully!"
+    "loginWithRecruiter": "Login with Recruiter",
+    "loginWithResearcher": "Login with Researcher",
+    "loginSuccess": "Logged in successfully!",
+    "loginFailed": "Unable to log in. Please try again."
   },
   "Home": {
     "searchPrompt": "Search <count>{value}</count> jobs now"
@@ -82,6 +85,22 @@
       "create": "Create",
       "company": "Company",
       "account": "Account"
+    }
+  },
+  "RecruiterMyJobs": {
+    "title": "Jobs you uploaded",
+    "subtitle": "Preview your posted roles and their applicants. Replace this demo with live data when connected.",
+    "demoBadge": "Demo data",
+    "uploadedLabel": "Uploaded by you",
+    "applicantsCount": "{count, plural, one {# applicant} other {# applicants}}",
+    "dialogSubtitle": "People who applied to this role",
+    "appliedAt": "Applied {time}",
+    "statusLabel": "Status",
+    "noApplicants": "No one has applied yet.",
+    "status": {
+      "reviewing": "Reviewing",
+      "shortlisted": "Shortlisted",
+      "rejected": "Rejected"
     }
   },
   "PostJob": {

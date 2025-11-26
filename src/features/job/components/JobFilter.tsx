@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,27 +12,82 @@ import { ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 type SortOption = "relevance" | "date";
-type JobType = "all" | "full-time" | "part-time" | "contract" | "internship";
+type JobType = "fulltime" | "parttime" | "contract";
 type ListedDate = "all" | "24h" | "3d" | "7d" | "30d";
 
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
 export function JobFilter() {
-  const [sortBy, setSortBy] = useState<SortOption>("relevance");
-  const [jobType, setJobType] = useState<JobType>("all");
-  const [listedDate, setListedDate] = useState<ListedDate>("all");
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const skipNextPush = useRef(false);
+  const [sortBy, setSortBy] = useState<SortOption>(
+    (searchParams.get("sortBy") as SortOption) ?? "relevance"
+  );
+  const [jobType, setJobType] = useState<JobType | null>(
+    (searchParams.get("jobType") as JobType) ?? null
+  );
+  const [listedDate, setListedDate] = useState<ListedDate>(
+    (searchParams.get("listedDate") as ListedDate) ?? "all"
+  );
+  const isFirstRender = useRef(true);
+  const router = useRouter();
   const t = useTranslations("JobFilter");
 
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    if (skipNextPush.current) {
+      skipNextPush.current = false;
+      return;
+    }
+
+    const params = new URLSearchParams(searchParams.toString());
+    if (sortBy === "relevance") {
+      params.delete("sortBy");
+    } else {
+      params.set("sortBy", sortBy);
+    }
+
+    if (jobType) {
+      params.set("jobType", jobType);
+    } else {
+      params.delete("jobType");
+    }
+
+    if (listedDate !== "all") {
+      params.set("listedDate", listedDate);
+    } else {
+      params.delete("listedDate");
+    }
+
+    const queryString = params.toString();
+    router.push(queryString ? `${pathname}?${queryString}` : pathname);
+  }, [jobType, listedDate, pathname, sortBy]);
+
   const resetFilters = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    ["sortBy", "jobType", "listedDate", "what", "where"].forEach((key) =>
+      params.delete(key)
+    );
+
     setSortBy("relevance");
-    setJobType("all");
+    setJobType(null);
     setListedDate("all");
+
+    skipNextPush.current = true;
+
+    const queryString = params.toString();
+    router.push(queryString ? `${pathname}?${queryString}` : pathname);
   };
 
   const jobTypeLabels: Record<JobType, string> = {
-    all: t("jobType"),
-    "full-time": t("fullTime"),
-    "part-time": t("partTime"),
+    fulltime: t("fullTime"),
+    parttime: t("partTime"),
     contract: t("contract"),
-    internship: t("internship"),
   };
 
   const listedDateLabels: Record<ListedDate, string> = {
@@ -81,9 +136,9 @@ export function JobFilter() {
           <Button
             size={"sm"}
             variant="outline"
-            className="flex items-center justify-between rounded-full border-border bg-background hover:bg-accent text-foreground w-full sm:w-auto"
+            className="flex items-center justify-between rounded-md border-border bg-background hover:bg-accent text-foreground w-full sm:w-auto"
           >
-            {jobTypeLabels[jobType]}
+            {jobType ? jobTypeLabels[jobType] : t("jobType")}
             <ChevronDown className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
@@ -105,7 +160,7 @@ export function JobFilter() {
           <Button
             size={"sm"}
             variant="outline"
-            className="flex items-center justify-between rounded-full border-border bg-background hover:bg-accent text-foreground w-full sm:w-auto"
+            className="flex items-center justify-between rounded-md border-border bg-background hover:bg-accent text-foreground w-full sm:w-auto"
           >
             {listedDateLabels[listedDate]}
             <ChevronDown className="h-4 w-4" />

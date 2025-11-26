@@ -73,3 +73,10 @@ export interface JobPostingsResponse {
   data: JobPosting[];
   timestamp: string;
 }
+
+export interface JobPostingResponse {
+  statusCode: number;
+  message: string;
+  data: JobPosting;
+  timestamp: string;
+}

@@ -1,26 +1,21 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useMemo, useState } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { useState } from "react";
-import {
-  ScanFace,
   Bell,
   ChevronDown,
   User,
   FileText,
   LogOut,
+  UserRoundSearch,
+  Users,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTranslations } from "next-intl";
 import { showToast } from "@/lib";
 import { useGoogleLogin } from "@/features/auth/queries/auth";
+import type { LoginRole } from "@/features/auth/services/auth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,23 +23,39 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
 
 const LoginForm = () => {
   const t = useTranslations("Auth");
-  const [isRecruiter, setIsRecruiter] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [cvName, setCvName] = useState<string | null>(null);
+  const [profile, setProfile] = useState({
+    name: "Jane Doe",
+    email: "jane.doe@email.com",
+    phone: "+95 9 123 456 789",
+    headline: "Product Designer",
+    location: "Yangon, Myanmar",
+    bio: "Designing thoughtful experiences for SaaS and marketplace products.",
+  });
   const { mutate: loginWithGoogle, isPending: isGoogleLoginPending } =
     useGoogleLogin();
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoggedIn(true);
-    showToast("success", t("loginSuccess"));
-  };
-
-  const handleGoogleLogin = () => {
-    const selectedRole = isRecruiter ? "recruiter" : "researcher";
-    const res = loginWithGoogle(selectedRole);
+  const handleRoleLogin = (role?: LoginRole) => {
+    if (isGoogleLoginPending) {
+      return;
+    }
+    const res = loginWithGoogle(role);
     console.log("res :>> ", res);
   };
 
@@ -53,9 +64,22 @@ const LoginForm = () => {
     showToast("success", "Logged out successfully");
   };
 
-  const handleMenuSelect = (message: string) => {
-    showToast("info", message);
+  const handleProfileSave = () => {
+    showToast("success", "Profile updated (demo)");
+    setIsEditOpen(false);
   };
+
+  const initialAvatar = useMemo(
+    () =>
+      profile.name
+        .split(" ")
+        .filter(Boolean)
+        .map((word) => word[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase(),
+    [profile.name]
+  );
 
   if (isLoggedIn) {
     return (
@@ -71,20 +95,18 @@ const LoginForm = () => {
                   src="https://github.com/shadcn.png"
                   alt="@shadcn"
                 />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarFallback>{initialAvatar || "ME"}</AvatarFallback>
               </Avatar>
               <ChevronDown className="absolute -bottom-1 -right-1 w-3 h-3 bg-background rounded-full border" />
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem
-              onSelect={() => handleMenuSelect("Navigate to Edit Profile")}
-            >
+            <DropdownMenuItem onSelect={() => setIsEditOpen(true)}>
               <User className="w-4 h-4" />
               Edit Profile
             </DropdownMenuItem>
             <DropdownMenuItem
-              onSelect={() => handleMenuSelect("Check application status")}
+              onSelect={() => showToast("info", "Check application status")}
             >
               <FileText className="w-4 h-4" />
               Application Status
@@ -96,72 +118,168 @@ const LoginForm = () => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Edit profile</DialogTitle>
+              <p className="text-sm text-muted-foreground">
+                Update your basic info and upload a CV. This is a demo form;
+                data won&apos;t persist.
+              </p>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-1">
+                  <Label htmlFor="name">Full name</Label>
+                  <Input
+                    id="name"
+                    value={profile.name}
+                    onChange={(e) =>
+                      setProfile((prev) => ({ ...prev, name: e.target.value }))
+                    }
+                    placeholder="Enter your name"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="headline">Headline</Label>
+                  <Input
+                    id="headline"
+                    value={profile.headline}
+                    onChange={(e) =>
+                      setProfile((prev) => ({
+                        ...prev,
+                        headline: e.target.value,
+                      }))
+                    }
+                    placeholder="e.g. Frontend Engineer"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-1">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={profile.email}
+                    onChange={(e) =>
+                      setProfile((prev) => ({ ...prev, email: e.target.value }))
+                    }
+                    placeholder="you@example.com"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    value={profile.phone}
+                    onChange={(e) =>
+                      setProfile((prev) => ({ ...prev, phone: e.target.value }))
+                    }
+                    placeholder="+95 ..."
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="location">Location</Label>
+                <Input
+                  id="location"
+                  value={profile.location}
+                  onChange={(e) =>
+                    setProfile((prev) => ({
+                      ...prev,
+                      location: e.target.value,
+                    }))
+                  }
+                  placeholder="City, Country"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="bio">About</Label>
+                <Textarea
+                  id="bio"
+                  value={profile.bio}
+                  onChange={(e) =>
+                    setProfile((prev) => ({ ...prev, bio: e.target.value }))
+                  }
+                  rows={3}
+                  placeholder="Tell recruiters about yourself"
+                />
+              </div>
+
+              <Separator />
+
+              <div className="space-y-2">
+                <Label htmlFor="cv">Upload CV</Label>
+                <div className="flex items-center gap-3">
+                  <Input
+                    id="cv"
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    className="cursor-pointer"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      setCvName(file ? file.name : null);
+                    }}
+                  />
+                  {cvName && (
+                    <span className="text-sm text-muted-foreground truncate">
+                      {cvName}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Accepted: PDF, DOC, DOCX. Max 10MB.
+                </p>
+              </div>
+            </div>
+
+            <DialogFooter className="mt-2">
+              <Button variant="outline" onClick={() => setIsEditOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleProfileSave}>Save changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
 
   return (
-    <Dialog>
-      <DialogTrigger className="text-sm font-semibold px-2 py-1 cursor-pointer">
-        {t("login")}
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>
-            {t("loginAs", {
-              role: t(isRecruiter ? "roleRecruiter" : "roleResearcher"),
-            })}
-          </DialogTitle>
-        </DialogHeader>
-        <form className="flex flex-col gap-4 mt-3" onSubmit={handleLogin}>
-          <input
-            type="text"
-            placeholder={t("username")}
-            className="border rounded px-3 py-2"
-          />
-          <input
-            type="password"
-            placeholder={t("password")}
-            className="border rounded px-3 py-2"
-          />
-
-          <div className="flex items-center gap-2 my-2">
-            <input
-              type="checkbox"
-              checked={isRecruiter}
-              onChange={() => setIsRecruiter((prev) => !prev)}
-            />
-            <span>
-              {t("recruiterCheckbox")}{" "}
-              <span className="text-xs text-muted-foreground">
-                {t("recruiterHint")}
-              </span>
-            </span>
-          </div>
-
-          <Button type="submit" className="w-full">
-            {t("loginButton")}
-          </Button>
-          <div className="flex items-center my-2">
-            <div className="flex-grow border-t" />
-            <span className="mx-2 text-xs text-muted-foreground">
-              {t("or")}
-            </span>
-            <div className="flex-grow border-t" />
-          </div>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
           <Button
-            type="button"
-            variant="outline"
-            className="w-full flex items-center justify-center gap-2"
-            onClick={handleGoogleLogin}
+            variant="ghost"
+            className="text-sm px-2 py-1 cursor-pointer flex items-center gap-1"
             disabled={isGoogleLoginPending}
           >
-            <ScanFace />
-            {t("loginWithGoogle")}
+            {t("login")} <ChevronDown className="w-4 h-4" />
           </Button>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-50">
+          <DropdownMenuItem
+            onSelect={() => handleRoleLogin()}
+            disabled={isGoogleLoginPending}
+          >
+            <Users className="w-4 h-4" />
+            {t("loginWithResearcher")}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={() => handleRoleLogin("recruiter")}
+            disabled={isGoogleLoginPending}
+          >
+            <UserRoundSearch className="w-4 h-4" />
+            {t("loginWithRecruiter")}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
   );
 };
 

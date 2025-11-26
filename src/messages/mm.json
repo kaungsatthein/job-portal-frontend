@@ -14,7 +14,10 @@
     "loginButton": "လော့ဂ်အင်",
     "or": "သို့မဟုတ်",
     "loginWithGoogle": "Google ဖြင့် လော့ဂ်အင်လုပ်မည်",
-    "loginSuccess": "လော့ဂ်အင် အောင်မြင်ပါသည်။"
+    "loginWithRecruiter": "အလုပ်ခေါ်ယူသူအဖြစ် လော့ဂ်အင်",
+    "loginWithResearcher": "အလုပ်ရှာဖွေသူအဖြစ် လော့ဂ်အင်",
+    "loginSuccess": "လော့ဂ်အင် အောင်မြင်ပါသည်။",
+    "loginFailed": "လော့ဂ်အင် မအောင်မြင်ပါ၊ ထပ်မံကြိုးစားပေးပါ။"
   },
   "Home": {
     "searchPrompt": "အလုပ် <count>{value}</count> ခုကို ယခုပဲ ရှာဖွေပါ"
@@ -82,6 +85,22 @@
       "create": "အသစ် ဖန်တီးရန်",
       "company": "ကုမ္ပဏီ",
       "account": "အကောင့်"
+    }
+  },
+  "RecruiterMyJobs": {
+    "title": "သင့်တင်ထားသော အလုပ်များ",
+    "subtitle": "လျှောက်ထားသူစာရင်းနှင့်အတူ သင့်တင်ထားသော အလုပ်များကို ကြိုတင်ကြည့်ရှုနိုင်သည်။ live data ချိတ်လိုက်ပါက ဤ demo ကို အစားထိုးနိုင်သည်။",
+    "demoBadge": "နမူနာ ဒေတာ",
+    "uploadedLabel": "သင့်ထံမှ တင်ထားသည်",
+    "applicantsCount": "{count} ဦး လျှောက်ထားပြီး",
+    "dialogSubtitle": "ဤအလုပ်အတွက် လျှောက်ထားသူများ",
+    "appliedAt": "{time} တွင် လျှောက်ထားသည်",
+    "statusLabel": "အခြေအနေ",
+    "noApplicants": "လျှောက်ထားသူ မရှိသေးပါ",
+    "status": {
+      "reviewing": "စစ်ဆေးဆဲ",
+      "shortlisted": "Shortlisted",
+      "rejected": "ငြင်းပယ်သည်"
     }
   },
   "PostJob": {

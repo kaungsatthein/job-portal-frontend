@@ -1,7 +1,8 @@
-import { Separator } from "@/components/ui/separator";
-import { JobFilter, JobList, JobSearchBar } from "@/features/job";
-import { fetchJobPostings } from "@/features/job/services/job-postings";
+import { JobDetailCard } from "@/features/job";
+import { fetchJobPosting } from "@/features/job/services/job-postings";
 import { Job, JobPosting } from "@/features/job/type";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 const formatJobType = (jobType: string) => {
   if (!jobType) return "Not specified";
@@ -51,40 +52,30 @@ const mapJobPostingToJob = (posting: JobPosting): Job => ({
   applicationsCount: posting.applications?.length ?? 0,
 });
 
-export default async function JobsPage({
-  searchParams,
+export default async function JobDetailPage({
+  params,
 }: {
-  searchParams: Promise<{ what?: string; where?: string; jobType?: string }>;
+  params: { locale: string; id: string };
 }) {
-  const params = await searchParams;
-  const { what, where, jobType } = params;
-
-  console.log("jobType :>> ", jobType);
-
-  let jobs: Job[] = [];
+  const { locale, id } = params;
 
   try {
-    const jobPostings = await fetchJobPostings({
-      search: what,
-      jobType,
-      // location: where,
-    });
-    console.log("jobPostingsss :>> ", jobPostings);
-    jobs = jobPostings?.data?.map(mapJobPostingToJob) ?? [];
-  } catch (error) {
-    console.error("Failed to fetch job postings", error);
-  }
+    const jobPosting = await fetchJobPosting(id);
+    const job = mapJobPostingToJob(jobPosting);
 
-  return (
-    <div className="mt-5">
-      <div className="mx-4 lg:mx-8">
-        <JobSearchBar what={what} where={where} />
+    return (
+      <div className="mx-4 lg:mx-8 my-6 space-y-4">
+        <Link
+          href={`/${locale}/jobs`}
+          className="inline-flex items-center text-sm text-primary hover:underline"
+        >
+          Back to jobs
+        </Link>
+        <JobDetailCard job={job} />
       </div>
-      <div className="mt-3 mb-5 lg:mx-8 mx-4">
-        <JobFilter />
-      </div>
-      <Separator className="my-8" />
-      <JobList jobs={jobs} />
-    </div>
-  );
+    );
+  } catch (error) {
+    console.error("Failed to fetch job posting", error);
+    notFound();
+  }
 }
