@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +14,6 @@ import { useTranslations } from "next-intl";
 
 type SortOption = "relevance" | "date";
 type JobType = "fulltime" | "parttime" | "contract";
-type ListedDate = "all" | "24h" | "3d" | "7d" | "30d";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -27,8 +27,11 @@ export function JobFilter() {
   const [jobType, setJobType] = useState<JobType | null>(
     (searchParams.get("jobType") as JobType) ?? null
   );
-  const [listedDate, setListedDate] = useState<ListedDate>(
-    (searchParams.get("listedDate") as ListedDate) ?? "all"
+  const [startDate, setStartDate] = useState<string>(
+    searchParams.get("startDate") ?? ""
+  );
+  const [endDate, setEndDate] = useState<string>(
+    searchParams.get("endDate") ?? ""
   );
   const isFirstRender = useRef(true);
   const router = useRouter();
@@ -58,25 +61,32 @@ export function JobFilter() {
       params.delete("jobType");
     }
 
-    if (listedDate !== "all") {
-      params.set("listedDate", listedDate);
+    if (startDate) {
+      params.set("startDate", startDate);
     } else {
-      params.delete("listedDate");
+      params.delete("startDate");
+    }
+
+    if (endDate) {
+      params.set("endDate", endDate);
+    } else {
+      params.delete("endDate");
     }
 
     const queryString = params.toString();
     router.push(queryString ? `${pathname}?${queryString}` : pathname);
-  }, [jobType, listedDate, pathname, sortBy]);
+  }, [endDate, jobType, pathname, sortBy, startDate]);
 
   const resetFilters = () => {
     const params = new URLSearchParams(searchParams.toString());
-    ["sortBy", "jobType", "listedDate", "what", "where"].forEach((key) =>
-      params.delete(key)
+    ["sortBy", "jobType", "startDate", "endDate", "what", "where"].forEach(
+      (key) => params.delete(key)
     );
 
     setSortBy("relevance");
     setJobType(null);
-    setListedDate("all");
+    setStartDate("");
+    setEndDate("");
 
     skipNextPush.current = true;
 
@@ -88,14 +98,6 @@ export function JobFilter() {
     fulltime: t("fullTime"),
     parttime: t("partTime"),
     contract: t("contract"),
-  };
-
-  const listedDateLabels: Record<ListedDate, string> = {
-    all: t("listedDate"),
-    "24h": t("last24h"),
-    "3d": t("last3d"),
-    "7d": t("last7d"),
-    "30d": t("last30d"),
   };
 
   return (
@@ -154,29 +156,31 @@ export function JobFilter() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Listed date dropdown */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            size={"sm"}
-            variant="outline"
-            className="flex items-center justify-between rounded-md border-border bg-background hover:bg-accent text-foreground w-full sm:w-auto"
-          >
-            {listedDateLabels[listedDate]}
-            <ChevronDown className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-48">
-          {Object.entries(listedDateLabels).map(([key, label]) => (
-            <DropdownMenuItem
-              key={key}
-              onClick={() => setListedDate(key as ListedDate)}
-            >
-              {label}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {/* Date range */}
+      <div className="flex items-center gap-2">
+        <label className="text-sm text-foreground" htmlFor="startDate">
+          {t("startDate")}
+        </label>
+        <Input
+          id="startDate"
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          className="h-9 w-40"
+        />
+      </div>
+      <div className="flex items-center gap-2">
+        <label className="text-sm text-foreground" htmlFor="endDate">
+          {t("endDate")}
+        </label>
+        <Input
+          id="endDate"
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          className="h-9 w-40"
+        />
+      </div>
 
       {/* Reset filters */}
       <Button

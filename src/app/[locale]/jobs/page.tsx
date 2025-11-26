@@ -54,11 +54,17 @@ const mapJobPostingToJob = (posting: JobPosting): Job => ({
 export default async function JobsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ what?: string; where?: string; jobType?: string }>;
+  searchParams: Promise<{
+    what?: string;
+    where?: string;
+    jobType?: string;
+    startDate?: string;
+    endDate?: string;
+    location?: string;
+  }>;
 }) {
   const params = await searchParams;
-  const { what, where, jobType } = params;
-
+  const { what, where, jobType, startDate, endDate } = params;
   console.log("jobType :>> ", jobType);
 
   let jobs: Job[] = [];
@@ -67,7 +73,9 @@ export default async function JobsPage({
     const jobPostings = await fetchJobPostings({
       search: what,
       jobType,
-      // location: where,
+      startDate,
+      endDate,
+      location: where,
     });
     console.log("jobPostingsss :>> ", jobPostings);
     jobs = jobPostings?.data?.map(mapJobPostingToJob) ?? [];

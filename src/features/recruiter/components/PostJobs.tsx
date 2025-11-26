@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 import { createStep1Schema, createStep2Schema } from "../schema/jobs";
 import { CompanyOption, JobFormValues } from "../types/jobs.type";
 import StepPosition from "./steps/StepPosition";
@@ -22,7 +21,6 @@ const mockCompanies: CompanyOption[] = [
 ];
 
 const PostJobs = ({ setTab }: { setTab: (tab: string) => void }) => {
-  const router = useRouter();
   const [step, setStep] = useState(1);
   const t = useTranslations("PostJob");
   const step1Schema = useMemo<AnyObjectSchema>(
@@ -95,7 +93,6 @@ const PostJobs = ({ setTab }: { setTab: (tab: string) => void }) => {
             errors={errors}
             control={control}
             setTab={setTab}
-            router={router}
             selectedCompany={selectedCompany}
             mockCompanies={mockCompanies}
           />

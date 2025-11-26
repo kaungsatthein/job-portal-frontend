@@ -10,6 +10,7 @@ interface FetchJobPostingsParams {
   endDate?: string;
   page?: number;
   limit?: number;
+  location?: string;
 }
 
 export const fetchJobPostings = async ({
@@ -19,6 +20,7 @@ export const fetchJobPostings = async ({
   endDate,
   page = 1,
   limit = 10,
+  location,
 }: FetchJobPostingsParams): Promise<JobPostingsResponse> => {
   const response = await apiInstance.get("/job-postings", {
     params: {
@@ -29,6 +31,7 @@ export const fetchJobPostings = async ({
       endDate,
       page,
       limit,
+      location,
     },
   });
   return response.data.data;
