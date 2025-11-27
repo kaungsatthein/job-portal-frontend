@@ -120,6 +120,10 @@
       "actionTwo": "Message the recruiter if you need to adjust timing."
     }
   },
+  "SavedJobs": {
+    "title": "Saved jobs",
+    "subtitle": "{count, plural, one {You saved # job} other {You saved # jobs}}"
+  },
   "Recruiter": {
     "title": "Recruiter Dashboard",
     "subtitle": "Manage your jobs, posts, and accounts",

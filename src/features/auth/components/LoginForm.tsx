@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   CalendarClock,
@@ -18,6 +18,7 @@ import {
   LogOut,
   UserRoundSearch,
   Users,
+  BookmarkCheck,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useLocale, useTranslations } from "next-intl";
@@ -45,6 +46,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../context";
 
 type NotificationCategory = "application" | "interview" | "reminder" | "system";
 
@@ -100,7 +102,7 @@ const LoginForm = () => {
   const t = useTranslations("Auth");
   const locale = useLocale();
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const { user, isLoading, signOut } = useAuth();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [cvName, setCvName] = useState<string | null>(null);
   const [profile, setProfile] = useState({
@@ -163,7 +165,7 @@ const LoginForm = () => {
   };
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
+    signOut();
     showToast("success", "Logged out successfully");
   };
 
@@ -174,6 +176,10 @@ const LoginForm = () => {
 
   const goToApplicationStatus = () => {
     router.push(`/${locale}/application-status`);
+  };
+
+  const goToSavedJobs = () => {
+    router.push(`/${locale}/saved-jobs`);
   };
 
   const unreadCount = useMemo(
@@ -214,7 +220,30 @@ const LoginForm = () => {
     [profile.name]
   );
 
-  if (isLoggedIn) {
+  useEffect(() => {
+    if (user && typeof user === "object") {
+      setProfile((prev) => ({
+        name: (user as any)?.name ?? prev.name,
+        email: (user as any)?.email ?? prev.email,
+        phone: (user as any)?.phone ?? prev.phone,
+        headline: (user as any)?.headline ?? prev.headline,
+        location: (user as any)?.location ?? prev.location,
+        bio: (user as any)?.bio ?? prev.bio,
+      }));
+    }
+  }, [user]);
+
+  console.log("profile :>> ", profile);
+
+  if (isLoading) {
+    return (
+      <Button variant="ghost" className="text-sm px-2 py-1" disabled>
+        Loading...
+      </Button>
+    );
+  }
+
+  if (user) {
     return (
       <div className="flex items-center gap-4">
         <DropdownMenu modal={false}>
@@ -407,11 +436,13 @@ const LoginForm = () => {
               <User className="w-4 h-4" />
               Edit Profile
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={goToApplicationStatus}
-            >
+            <DropdownMenuItem onSelect={goToApplicationStatus}>
               <FileText className="w-4 h-4" />
               Application Status
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={goToSavedJobs}>
+              <BookmarkCheck className="w-4 h-4" />
+              Saved Jobs
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem variant="destructive" onSelect={handleLogout}>
