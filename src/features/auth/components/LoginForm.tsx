@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   CalendarClock,
@@ -49,6 +49,11 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "../context";
+import {
+  NotificationItemResponse,
+  useMarkNotificationRead,
+  useNotifications as useNotificationsQuery,
+} from "@/features/notifications/services/notifications";
 
 type NotificationCategory = "application" | "interview" | "reminder" | "system";
 
@@ -100,6 +105,53 @@ const notificationTone: Record<
   },
 };
 
+const notificationCategoryMap: Record<string, NotificationCategory> = {
+  job_update: "application",
+  application: "application",
+  interview: "interview",
+  reminder: "reminder",
+  profile: "system",
+  system: "system",
+};
+
+const defaultNotifications: NotificationItem[] = [
+  {
+    id: "1",
+    title: "Interview confirmed with Acme",
+    description: "Recruiter scheduled a 45 min interview for Tuesday, 3 PM.",
+    time: "2h ago",
+    category: "interview",
+    unread: true,
+    actionLabel: "Review prep guide",
+  },
+  {
+    id: "2",
+    title: "Application viewed",
+    description: "Your profile for Lead Product Designer was opened.",
+    time: "6h ago",
+    category: "application",
+    unread: true,
+    actionLabel: "Open application",
+  },
+  {
+    id: "3",
+    title: "Add a quick portfolio note",
+    description:
+      "Help recruiters by pinning a project link to your profile summary.",
+    time: "Yesterday",
+    category: "reminder",
+    actionLabel: "Add note",
+  },
+  {
+    id: "4",
+    title: "Product update",
+    description:
+      "Saved jobs now sync with interview reminders on your dashboard.",
+    time: "2 days ago",
+    category: "system",
+  },
+];
+
 const LoginForm = () => {
   const t = useTranslations("Auth");
   const locale = useLocale();
@@ -122,47 +174,49 @@ const LoginForm = () => {
   const [notificationFilter, setNotificationFilter] = useState<
     "all" | "unread"
   >("all");
+  const { data: remoteNotifications } = useNotificationsQuery();
+  const markNotificationReadMutation = useMarkNotificationRead();
   const [showWelcome, setShowWelcome] = useState(false);
-
-  console.log("showWelcome :>> ", showWelcome);
   const [isUploadingResume, setIsUploadingResume] = useState(false);
-  const [notifications, setNotifications] = useState<NotificationItem[]>([
-    {
-      id: "1",
-      title: "Interview confirmed with Acme",
-      description: "Recruiter scheduled a 45 min interview for Tuesday, 3 PM.",
-      time: "2h ago",
-      category: "interview",
-      unread: true,
-      actionLabel: "Review prep guide",
+  const [notifications, setNotifications] =
+    useState<NotificationItem[]>(defaultNotifications);
+  const formatNotificationTime = useCallback((dateString: string) => {
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) {
+      return "Just now";
+    }
+    return date.toLocaleString();
+  }, []);
+
+  const mapApiNotification = useCallback(
+    (notification: NotificationItemResponse): NotificationItem => {
+      const category =
+        notificationCategoryMap[notification.type?.toLowerCase() || ""] ??
+        "system";
+      return {
+        id: notification.id,
+        title:
+          notification.type
+            ?.replace(/_/g, " ")
+            ?.replace(/\b\w/g, (char) => char.toUpperCase()) ||
+          "Notification",
+        description: notification.message,
+        time: formatNotificationTime(notification.createdAt),
+        category,
+        unread: !notification.readAt,
+      };
     },
-    {
-      id: "2",
-      title: "Application viewed",
-      description: "Your profile for Lead Product Designer was opened.",
-      time: "6h ago",
-      category: "application",
-      unread: true,
-      actionLabel: "Open application",
-    },
-    {
-      id: "3",
-      title: "Add a quick portfolio note",
-      description:
-        "Help recruiters by pinning a project link to your profile summary.",
-      time: "Yesterday",
-      category: "reminder",
-      actionLabel: "Add note",
-    },
-    {
-      id: "4",
-      title: "Product update",
-      description:
-        "Saved jobs now sync with interview reminders on your dashboard.",
-      time: "2 days ago",
-      category: "system",
-    },
-  ]);
+    [formatNotificationTime]
+  );
+
+  useEffect(() => {
+    if (!remoteNotifications) return;
+    if (remoteNotifications.length === 0) {
+      setNotifications([]);
+      return;
+    }
+    setNotifications(remoteNotifications.map(mapApiNotification));
+  }, [remoteNotifications, mapApiNotification]);
   const { mutate: loginWithGoogle, isPending: isGoogleLoginPending } =
     useGoogleLogin(refreshUser);
 
@@ -173,7 +227,6 @@ const LoginForm = () => {
     loginWithGoogle(role);
   };
 
-  console.log("profile :>> ", profile);
 
   const handleLogout = () => {
     signOut();
@@ -190,9 +243,7 @@ const LoginForm = () => {
     setIsUploadingResume(true);
     try {
       const result = await uploadResume(file);
-      console.log("result :>> ", result);
       const url = result?.url || result?.fileUrl || result?.path || result;
-      console.log("url :>> ", url);
       if (typeof url === "string" && url.length > 0) {
         setProfile((prev) => ({ ...prev, resumeUrl: url }));
         showToast("success", t("resumeUploaded"));
@@ -281,17 +332,37 @@ const LoginForm = () => {
     }
   }, [profile.resumeUrl]);
 
-  const markNotificationRead = (id: string) => {
+  const handleNotificationRead = async (id: string) => {
+    if (!id) return;
+    const previous = notifications;
     setNotifications((prev) =>
       prev.map((item) => (item.id === id ? { ...item, unread: false } : item))
     );
+    try {
+      await markNotificationReadMutation.mutateAsync(id);
+    } catch (error) {
+      console.error("Failed to mark notification as read", error);
+      setNotifications(previous);
+    }
   };
 
-  const markAllNotificationsRead = () => {
+  const handleMarkAllNotificationsRead = async () => {
     if (!unreadCount) return;
+    const previous = notifications;
+    const unreadIds = notifications
+      .filter((item) => item.unread)
+      .map((item) => item.id);
     setNotifications((prev) =>
       prev.map((item) => ({ ...item, unread: false }))
     );
+    try {
+      await Promise.all(
+        unreadIds.map((id) => markNotificationReadMutation.mutateAsync(id))
+      );
+    } catch (error) {
+      console.error("Failed to mark notifications as read", error);
+      setNotifications(previous);
+    }
   };
 
   const initialAvatar = useMemo(
@@ -330,7 +401,6 @@ const LoginForm = () => {
     }
   }, [user]);
 
-  console.log("profile :>> ", profile);
 
   if (isLoading) {
     return (
@@ -450,7 +520,7 @@ const LoginForm = () => {
                           ? "border-primary/40 bg-primary/5 shadow-sm"
                           : "hover:border-primary/20 hover:bg-accent/60"
                       )}
-                      onClick={() => markNotificationRead(item.id)}
+                      onClick={() => handleNotificationRead(item.id)}
                     >
                       <div
                         className={cn(
@@ -500,7 +570,7 @@ const LoginForm = () => {
                               className="ml-auto inline-flex items-center gap-1 text-primary transition-colors hover:text-primary/80"
                               onClick={(event) => {
                                 event.stopPropagation();
-                                markNotificationRead(item.id);
+                              handleNotificationRead(item.id);
                               }}
                             >
                               {item.actionLabel}
@@ -527,7 +597,7 @@ const LoginForm = () => {
                 variant="ghost"
                 size="sm"
                 className="cursor-pointer"
-                onClick={markAllNotificationsRead}
+                onClick={handleMarkAllNotificationsRead}
                 disabled={!unreadCount}
               >
                 Mark all as read

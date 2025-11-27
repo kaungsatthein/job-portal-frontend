@@ -12,24 +12,10 @@ import {
 } from "@/features/job/services/saved-jobs";
 import { showToast } from "@/lib";
 import { Bookmark, BookmarkCheck } from "lucide-react";
+import type { Job } from "@/features/job/type";
 
 interface JobDetailCardProps {
-  job: {
-    id: string;
-    title: string;
-    company: string;
-    job_type: string;
-    location: string;
-    pay_range: string;
-    experience_required: string;
-    working_hours: string;
-    posted: string;
-    job_scope: string;
-    hasApplied?: boolean;
-    isSaved?: boolean;
-
-    savedJobId?: string | null;
-  };
+  job: Job;
 }
 
 export function JobDetailCard({ job }: JobDetailCardProps) {
@@ -44,6 +30,7 @@ export function JobDetailCard({ job }: JobDetailCardProps) {
   const [hasApplied, setHasApplied] = useState<boolean>(
     Boolean(job.hasApplied)
   );
+  const [isSaved, setIsSaved] = useState(Boolean(job.isSaved));
   const [savedJobId, setSavedJobId] = useState<string | null>(
     job.savedJobId ?? null
   );
@@ -51,6 +38,7 @@ export function JobDetailCard({ job }: JobDetailCardProps) {
   useEffect(() => {
     if (!user) {
       setHasApplied(Boolean(job.hasApplied));
+      setIsSaved(Boolean(job.isSaved));
       setSavedJobId(job.savedJobId ?? null);
       return;
     }
@@ -66,6 +54,8 @@ export function JobDetailCard({ job }: JobDetailCardProps) {
           saved.job?.id === job.id ||
           saved.id === job.savedJobId
       ) || null;
+    const isCurrentlySaved = Boolean(savedRecord) || Boolean(job.isSaved);
+    setIsSaved(isCurrentlySaved);
     setSavedJobId(savedRecord?.id ?? job.savedJobId ?? null);
   }, [user, job.id, job.hasApplied, job.isSaved, job.savedJobId]);
 
@@ -119,12 +109,14 @@ export function JobDetailCard({ job }: JobDetailCardProps) {
     }
     setIsSaving(true);
     try {
-      if (savedJobId) {
+      if (isSaved && savedJobId) {
         await removeSaveMutation.mutateAsync(savedJobId);
+        setIsSaved(false);
         setSavedJobId(null);
         showToast("success", jobCardT("unsavedSuccess"));
       } else {
         const saved = await saveMutation.mutateAsync(job.id);
+        setIsSaved(true);
         setSavedJobId(saved?.id ?? null);
         showToast("success", jobCardT("savedSuccess"));
       }
@@ -196,18 +188,25 @@ export function JobDetailCard({ job }: JobDetailCardProps) {
 
         {/* CTA Buttons */}
         <div className="flex flex-col gap-3 border-t border-border pt-6 sm:flex-row">
-          {/* <Button
-            variant={job.isSaved ? "secondary" : "outline"}
-            className="flex-1 bg-transparent"
+          <Button
+            variant={isSaved ? "secondary" : "outline"}
+            className="flex-1 bg-transparent gap-2"
             onClick={handleSaveToggle}
             disabled={isSaving}
           >
-            {isSaving
-              ? jobCardT("saving")
-              : job.isSaved
-              ? jobCardT("saved")
-              : t("saveJob")}
-          </Button> */}
+            {isSaving ? (
+              jobCardT("saving")
+            ) : (
+              <span className="inline-flex items-center gap-2 text-sm">
+                {isSaved ? (
+                  <BookmarkCheck className="h-4 w-4" />
+                ) : (
+                  <Bookmark className="h-4 w-4" />
+                )}
+                {isSaved ? jobCardT("unsave") : t("saveJob")}
+              </span>
+            )}
+          </Button>
           <Button
             className="flex-1"
             onClick={handleApply}

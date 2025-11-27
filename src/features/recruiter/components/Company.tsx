@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useForm, Controller } from "react-hook-form";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { createCompanySchema } from "../schema/company";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -15,25 +15,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createCompany } from "../services/company";
+import {
+  createCompany,
+  fetchIndustries,
+  IndustryOption,
+} from "../services/company";
 
 type CompanyFormValues = {
   name: string;
   industry: string;
 };
 
-// Demo industries (replace with API call later)
-const demoIndustries = [
-  { id: "technology" },
-  { id: "finance" },
-  { id: "healthcare" },
-  { id: "education" },
-];
-
 const Company = () => {
   const t = useTranslations("Company");
   const companySchema = useMemo(() => createCompanySchema(t), [t]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [industries, setIndustries] = useState<IndustryOption[]>([]);
+  const [isLoadingIndustries, setIsLoadingIndustries] = useState(true);
+  const [industryError, setIndustryError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -47,10 +46,41 @@ const Company = () => {
     },
   });
 
+  useEffect(() => {
+    let isMounted = true;
+    const loadIndustries = async () => {
+      setIsLoadingIndustries(true);
+      setIndustryError(null);
+      try {
+        const result = await fetchIndustries();
+        if (isMounted) {
+          setIndustries(result);
+        }
+      } catch (error: any) {
+        console.error("Failed to fetch industries", error);
+        if (isMounted) {
+          setIndustryError("Failed to load industries.");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingIndustries(false);
+        }
+      }
+    };
+
+    loadIndustries();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const onSubmit = async (data: CompanyFormValues) => {
     try {
       setIsSubmitting(true);
-      await createCompany(data.name);
+      await createCompany({
+        name: data.name,
+        industryId: data.industry,
+      });
       showToast("success", t("toastSuccess"));
       reset();
     } catch (error: any) {
@@ -92,14 +122,28 @@ const Company = () => {
               name="industry"
               control={control}
               render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={isLoadingIndustries || Boolean(industryError)}
+                >
                   <SelectTrigger className="w-full border p-2 rounded">
                     <SelectValue placeholder={t("industryPlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {demoIndustries.map((industry) => (
+                    {isLoadingIndustries && (
+                      <SelectItem value="loading" disabled>
+                        {t("loadingIndustries")}
+                      </SelectItem>
+                    )}
+                    {!isLoadingIndustries && industries.length === 0 && (
+                      <SelectItem value="empty" disabled>
+                        {t("noIndustries")}
+                      </SelectItem>
+                    )}
+                    {industries.map((industry) => (
                       <SelectItem key={industry.id} value={industry.id}>
-                        {t(`industries.${industry.id}`)}
+                        {industry.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -110,6 +154,9 @@ const Company = () => {
               <p className="text-red-500 text-sm mt-1">
                 {errors.industry.message}
               </p>
+            )}
+            {industryError && (
+              <p className="text-red-500 text-sm mt-1">{industryError}</p>
             )}
           </div>
 

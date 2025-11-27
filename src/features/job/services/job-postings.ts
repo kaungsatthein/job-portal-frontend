@@ -28,7 +28,7 @@ export const fetchJobPostings = async ({
 }: FetchJobPostingsParams): Promise<JobPostingsResponse> => {
   const response = await apiInstance.get("/job-postings", {
     params: {
-      status: "pending",
+      status: "open",
       search,
       jobType,
       startDate,

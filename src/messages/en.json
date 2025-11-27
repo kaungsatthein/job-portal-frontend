@@ -257,6 +257,8 @@
     "namePlaceholder": "Enter your company name",
     "industryLabel": "Industry",
     "industryPlaceholder": "Select industry",
+    "loadingIndustries": "Loading industries...",
+    "noIndustries": "No industries available",
     "submit": "Create Your Company",
     "toastSuccess": "Your company is successfully created.",
     "industries": {
