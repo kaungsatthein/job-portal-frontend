@@ -2,11 +2,12 @@ import { useMutation } from "@tanstack/react-query";
 import { logout, googleLogin, login } from "@/features/auth/services/auth";
 import { removeCookieStore } from "@/lib/common/store";
 
-export function useGoogleLogin() {
+export function useGoogleLogin(onAuthenticated?: () => void) {
   return useMutation({
     mutationFn: googleLogin,
     onSuccess: () => {
       console.log("Google login successful");
+      onAuthenticated?.();
     },
     onError: (error) => {
       console.error("Google login failed:", error);

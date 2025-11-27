@@ -2,14 +2,11 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Open_Sans } from "next/font/google";
 import "@/styles/globals.css";
-import { ThemeProvider } from "@/features/navigation/components/theme-provider";
+
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "@/lib";
 import { ToastWrapper } from "@/components/common";
-import NavBar from "@/features/navigation/NavBar";
-import Footer from "@/features/Footer";
-import ReactQueryProvider from "@/lib/common/ReactQueryProvider";
-import { AuthProvider } from "@/features/auth";
+import Container from "@/components/container";
 
 const openSans = Open_Sans({
   subsets: ["latin"],
@@ -35,7 +32,6 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>;
 }>) {
   const { locale } = await params;
-  const messages = getMessages(locale);
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -48,23 +44,8 @@ export default async function RootLayout({
               : "var(--font-z06-walone-bold)",
         }}
       >
+        <Container locale={locale}>{children}</Container>
         <ToastWrapper />
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <ReactQueryProvider>
-            <AuthProvider>
-              <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-                disableTransitionOnChange
-              >
-                <NavBar />
-                {children}
-                <Footer />
-              </ThemeProvider>
-            </AuthProvider>
-          </ReactQueryProvider>
-        </NextIntlClientProvider>
       </body>
     </html>
   );

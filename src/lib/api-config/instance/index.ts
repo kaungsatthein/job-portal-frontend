@@ -25,6 +25,8 @@ const setAuthToken = async (
 ): Promise<InternalAxiosRequestConfig> => {
   const token = await getCookieStore(USER_TOKEN_KEY);
 
+  console.log("token :>> ", token);
+
   if (config.headers) {
     if (token) {
       config.headers[AUTH_HEADER] = `${BEARER_PREFIX}${token}`;

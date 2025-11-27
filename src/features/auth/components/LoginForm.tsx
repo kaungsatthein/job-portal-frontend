@@ -45,7 +45,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "../context";
 
 type NotificationCategory = "application" | "interview" | "reminder" | "system";
@@ -102,16 +102,19 @@ const LoginForm = () => {
   const t = useTranslations("Auth");
   const locale = useLocale();
   const router = useRouter();
-  const { user, isLoading, signOut } = useAuth();
+  const pathname = usePathname();
+  const { user, isLoading, signOut, refreshUser, role } = useAuth();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [cvName, setCvName] = useState<string | null>(null);
   const [profile, setProfile] = useState({
-    name: "Jane Doe",
-    email: "jane.doe@email.com",
-    phone: "+95 9 123 456 789",
-    headline: "Product Designer",
-    location: "Yangon, Myanmar",
-    bio: "Designing thoughtful experiences for SaaS and marketplace products.",
+    avatar_url: "",
+    name: "",
+    email: "",
+    phone: "",
+    headline: "",
+    location: "",
+    bio: "",
+    role: "",
   });
   const [notificationFilter, setNotificationFilter] = useState<
     "all" | "unread"
@@ -154,14 +157,13 @@ const LoginForm = () => {
     },
   ]);
   const { mutate: loginWithGoogle, isPending: isGoogleLoginPending } =
-    useGoogleLogin();
+    useGoogleLogin(refreshUser);
 
   const handleRoleLogin = (role?: LoginRole) => {
     if (isGoogleLoginPending) {
       return;
     }
-    const res = loginWithGoogle(role);
-    console.log("res :>> ", res);
+    loginWithGoogle(role);
   };
 
   const handleLogout = () => {
@@ -181,6 +183,19 @@ const LoginForm = () => {
   const goToSavedJobs = () => {
     router.push(`/${locale}/saved-jobs`);
   };
+
+  useEffect(() => {
+    if (!role) return;
+    if (role === "recruiter" && pathname && !pathname.includes("/recruiter")) {
+      router.push(`/${locale}/recruiter`);
+    } else if (
+      role === "researcher" &&
+      pathname &&
+      pathname.includes("/recruiter")
+    ) {
+      router.push(`/${locale}`);
+    }
+  }, [role, locale, router, pathname]);
 
   const unreadCount = useMemo(
     () => notifications.filter((item) => item.unread).length,
@@ -214,7 +229,7 @@ const LoginForm = () => {
         .split(" ")
         .filter(Boolean)
         .map((word) => word[0])
-        .slice(0, 2)
+        .slice(0, 1)
         .join("")
         .toUpperCase(),
     [profile.name]
@@ -222,13 +237,16 @@ const LoginForm = () => {
 
   useEffect(() => {
     if (user && typeof user === "object") {
+      const u = user as any;
       setProfile((prev) => ({
-        name: (user as any)?.name ?? prev.name,
-        email: (user as any)?.email ?? prev.email,
-        phone: (user as any)?.phone ?? prev.phone,
-        headline: (user as any)?.headline ?? prev.headline,
-        location: (user as any)?.location ?? prev.location,
-        bio: (user as any)?.bio ?? prev.bio,
+        avatar_url: u?.avatar_url ?? prev.avatar_url,
+        name: u?.name ?? prev.name,
+        email: u?.email ?? prev.email,
+        phone: u?.phone ?? prev.phone,
+        headline: u?.headline ?? prev.headline,
+        location: u?.location ?? prev.location,
+        bio: u?.bio ?? prev.bio,
+        role: u?.role ?? prev.role,
       }));
     }
   }, [user]);
@@ -422,10 +440,7 @@ const LoginForm = () => {
           <DropdownMenuTrigger asChild>
             <div className="relative cursor-pointer">
               <Avatar className="w-6 h-6">
-                <AvatarImage
-                  src="https://github.com/shadcn.png"
-                  alt="@shadcn"
-                />
+                <AvatarImage src={profile.avatar_url} alt="@shadcn" />
                 <AvatarFallback>{initialAvatar || "ME"}</AvatarFallback>
               </Avatar>
               <ChevronDown className="absolute -bottom-1 -right-1 w-3 h-3 bg-background rounded-full border" />
@@ -436,14 +451,18 @@ const LoginForm = () => {
               <User className="w-4 h-4" />
               Edit Profile
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={goToApplicationStatus}>
-              <FileText className="w-4 h-4" />
-              Application Status
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={goToSavedJobs}>
-              <BookmarkCheck className="w-4 h-4" />
-              Saved Jobs
-            </DropdownMenuItem>
+            {role !== "recruiter" && (
+              <>
+                <DropdownMenuItem onSelect={goToApplicationStatus}>
+                  <FileText className="w-4 h-4" />
+                  Application Status
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={goToSavedJobs}>
+                  <BookmarkCheck className="w-4 h-4" />
+                  Saved Jobs
+                </DropdownMenuItem>
+              </>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem variant="destructive" onSelect={handleLogout}>
               <LogOut className="w-4 h-4" />
