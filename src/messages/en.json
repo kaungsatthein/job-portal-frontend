@@ -54,6 +54,20 @@
   "JobCard": {
     "new": "New to you",
     "save": "Save",
+    "unsave": "Unsave",
+    "saved": "Saved",
+    "saving": "Saving...",
+    "apply": "Apply",
+    "applying": "Applying...",
+    "appliedSuccess": "Application submitted.",
+    "appliedFailed": "Unable to submit application.",
+    "recruiterCannotApply": "Recruiters cannot apply to jobs.",
+    "researcherRequired": "Please log in as a researcher.",
+    "alreadyApplied": "Already applied",
+    "resumeRequired": "Please upload your resume in profile before applying.",
+    "savedSuccess": "Job saved.",
+    "unsavedSuccess": "Job removed from saved.",
+    "saveFailed": "Unable to update saved job.",
     "posted": "Posted {time}",
     "jobTypeLabel": "Job type",
     "salaryLabel": "Salary",
@@ -134,7 +148,10 @@
   },
   "SavedJobs": {
     "title": "Saved jobs",
-    "subtitle": "{count, plural, one {You saved # job} other {You saved # jobs}}"
+    "subtitle": "{count, plural, one {You saved # job} other {You saved # jobs}}",
+    "empty": "No saved jobs yet.",
+    "loading": "Loading saved jobs...",
+    "loginPrompt": "Sign in to view your saved jobs."
   },
   "Recruiter": {
     "title": "Recruiter Dashboard",
@@ -150,6 +167,7 @@
     "title": "Jobs you uploaded",
     "subtitle": "Preview your posted roles and their applicants. Replace this demo with live data when connected.",
     "demoBadge": "Demo data",
+    "liveBadge": "Live data",
     "uploadedLabel": "Uploaded by you",
     "applicantsCount": "{count, plural, one {# applicant} other {# applicants}}",
     "dialogSubtitle": "People who applied to this role",
@@ -160,9 +178,15 @@
     "noSearchResults": "No applicants match your search.",
     "deleteSuccess": "Job deleted.",
     "deleteFailed": "Unable to delete job.",
+    "demoDelete": "Removed demo job locally.",
+    "demoUpdate": "Updated demo applicant locally.",
+    "statusUpdated": "Application status updated.",
+    "statusUpdateFailed": "Unable to update status.",
+    "viewResume": "View resume",
     "status": {
-      "reviewing": "Reviewing",
-      "shortlisted": "Shortlisted",
+      "submitted": "Submitted",
+      "reviewed": "Reviewed",
+      "accepted": "Accepted",
       "rejected": "Rejected"
     }
   },

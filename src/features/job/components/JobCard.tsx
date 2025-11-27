@@ -1,12 +1,26 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Job } from "../type";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bookmark, Briefcase, MapPin, Banknote, Users } from "lucide-react";
+import {
+  Bookmark,
+  BookmarkCheck,
+  Briefcase,
+  MapPin,
+  Banknote,
+  Users,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/features/auth";
+import { showToast } from "@/lib";
+import { useApplyToJob } from "@/features/job/services/job-applications";
+import {
+  useSaveJob,
+  useRemoveSavedJob,
+} from "@/features/job/services/saved-jobs";
 
 interface JobCardProps {
   job: Job;
@@ -14,22 +28,21 @@ interface JobCardProps {
 
 export const JobCard = ({ job }: JobCardProps) => {
   const t = useTranslations("JobCard");
+  const { user, role, refreshUser } = useAuth();
+  const applyMutation = useApplyToJob();
+  const [isApplying, setIsApplying] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const saveMutation = useSaveJob();
+  const removeSaveMutation = useRemoveSavedJob();
+  const [hasApplied, setHasApplied] = useState<boolean>(
+    Boolean(job.hasApplied)
+  );
+  const [isSaved, setIsSaved] = useState(false);
+  const [savedJobId, setSavedJobId] = useState<string | null>(null);
 
   const hasWorkingHours =
     Boolean(job.working_hours) && job.working_hours !== "Not specified";
   const statusKey = job.status?.toLowerCase() ?? "";
-
-  const companyInitials = useMemo(() => {
-    return (
-      job.company
-        .split(" ")
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((word) => word[0]?.toUpperCase())
-        .join("")
-        .trim() || "JP"
-    );
-  }, [job.company]);
 
   const statusStyles: Record<string, string> = {
     pending: "bg-amber-50 text-amber-800 border-amber-100",
@@ -63,6 +76,97 @@ export const JobCard = ({ job }: JobCardProps) => {
       value: job.location,
     },
   ];
+
+  useEffect(() => {
+    if (!user) {
+      setHasApplied(Boolean(job.hasApplied));
+      setIsSaved(Boolean(job.isSaved));
+      setSavedJobId(job.savedJobId ?? null);
+      return;
+    }
+    const userApplied =
+      job.hasApplied ||
+      user.applications?.some((application) => application.jobId === job.id);
+    setHasApplied(Boolean(userApplied));
+
+    const savedRecord =
+      user.savedJobs?.find(
+        (saved) =>
+          saved.jobId === job.id ||
+          saved.job?.id === job.id ||
+          saved.id === job.savedJobId
+      ) || null;
+    setIsSaved(Boolean(savedRecord) || Boolean(job.isSaved));
+    setSavedJobId(savedRecord?.id ?? job.savedJobId ?? null);
+  }, [user, job.id, job.hasApplied, job.isSaved, job.savedJobId]);
+
+  const handleApply = async () => {
+    if (!user) {
+      showToast("info", t("researcherRequired"));
+      return;
+    }
+    if (role === "recruiter") {
+      showToast("info", t("recruiterCannotApply"));
+      return;
+    }
+    if (hasApplied) {
+      showToast("info", t("alreadyApplied"));
+      return;
+    }
+    if (!user.resumeUrl) {
+      showToast("info", t("resumeRequired"));
+      return;
+    }
+
+    setIsApplying(true);
+    try {
+      await applyMutation.mutateAsync({
+        researcherId: user.id,
+        jobId: job.id,
+        status: "submitted",
+      });
+      setHasApplied(true);
+      refreshUser();
+      showToast("success", t("appliedSuccess"));
+    } catch (error: any) {
+      console.error("Failed to apply", error);
+      showToast("error", error?.response?.data?.message || t("appliedFailed"));
+    } finally {
+      setIsApplying(false);
+    }
+  };
+
+  const handleSaveToggle = async () => {
+    if (!user) {
+      showToast("info", t("researcherRequired"));
+      return;
+    }
+    if (role === "recruiter") {
+      showToast("info", t("recruiterCannotApply"));
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      if (isSaved && savedJobId) {
+        await removeSaveMutation.mutateAsync(savedJobId);
+        setIsSaved(false);
+        setSavedJobId(null);
+        showToast("success", t("unsavedSuccess"));
+      } else {
+        const saved = await saveMutation.mutateAsync(job.id);
+        setIsSaved(true);
+        setSavedJobId(saved?.id ?? null);
+        showToast("success", t("savedSuccess"));
+      }
+      // refreshUser();
+    } catch (error: any) {
+      console.error("Failed to toggle saved job", error);
+      showToast("error", error?.response?.data?.message || t("saveFailed"));
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="w-full rounded-2xl border border-border/80 bg-card/80 p-5 shadow-sm transition-shadow hover:shadow-lg">
@@ -131,10 +235,35 @@ export const JobCard = ({ job }: JobCardProps) => {
             </>
           )}
         </div>
-        <Button variant="secondary" size="sm" className="rounded-full gap-2">
-          <Bookmark className="h-4 w-4" />
-          {t("save")}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant={isSaved ? "secondary" : "outline"}
+            size="sm"
+            className="rounded-full gap-2"
+            onClick={handleSaveToggle}
+            disabled={isSaving}
+          >
+            {isSaved ? (
+              <BookmarkCheck className="h-4 w-4" />
+            ) : (
+              <Bookmark className="h-4 w-4" />
+            )}
+            {isSaving ? t("saving") : isSaved ? t("unsave") : t("save")}
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            className="rounded-full"
+            onClick={handleApply}
+            disabled={isApplying || hasApplied}
+          >
+            {hasApplied
+              ? t("alreadyApplied")
+              : isApplying
+              ? t("applying")
+              : t("apply")}
+          </Button>
+        </div>
       </div>
     </div>
   );

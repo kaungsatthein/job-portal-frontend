@@ -49,6 +49,7 @@ const mapJobPostingToJob = (posting: JobPosting): Job => ({
   status: posting.status,
   companyIndustry: posting.company?.industryId,
   applicationsCount: posting.applications?.length ?? 0,
+  isSaved: Boolean((posting as any)?.isSaved),
 });
 
 export default async function JobsPage({

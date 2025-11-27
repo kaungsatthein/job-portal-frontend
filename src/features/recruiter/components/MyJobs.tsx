@@ -28,14 +28,18 @@ import {
   Trash2,
 } from "lucide-react";
 import { deleteJobPosting } from "@/features/job/services/job-postings";
+import { updateApplicationStatus } from "@/features/job/services/job-applications";
 import { showToast } from "@/lib";
 
 type Applicant = {
+  id?: string;
+  researcherId?: string;
   name: string;
   role: string;
   experience: string;
   appliedAt: string;
-  status: "reviewing" | "shortlisted" | "rejected";
+  status: "submitted" | "reviewed" | "accepted" | "rejected";
+  resumeUrl?: string | null;
 };
 
 type RecruiterJob = {
@@ -48,200 +52,20 @@ type RecruiterJob = {
   applicants: Applicant[];
 };
 
-const demoJobs: RecruiterJob[] = [
-  {
-    id: "1",
-    title: "Senior Frontend Engineer",
-    company: "Aurora Labs",
-    location: "Remote (GMT+7)",
-    job_type: "Full-time",
-    posted: "2d ago",
-    applicants: [
-      {
-        name: "Maya Chen",
-        role: "Frontend Engineer @ Pulse",
-        experience: "5 yrs • React / Next.js",
-        appliedAt: "2d ago",
-        status: "shortlisted",
-      },
-      {
-        name: "Richard Lee",
-        role: "UI Engineer @ Vertex",
-        experience: "4 yrs • Tailwind / Accessibility",
-        appliedAt: "1d ago",
-        status: "reviewing",
-      },
-      {
-        name: "Nandar Win",
-        role: "Frontend Developer @ Wave",
-        experience: "3 yrs • TypeScript / Storybook",
-        appliedAt: "6h ago",
-        status: "reviewing",
-      },
-    ],
-  },
-  {
-    id: "2",
-    title: "Product Designer (B2B SaaS)",
-    company: "NimbusHQ",
-    location: "Singapore • Hybrid",
-    job_type: "Hybrid",
-    posted: "5h ago",
-    applicants: [
-      {
-        name: "Sarah Tan",
-        role: "Senior Product Designer @ Flow",
-        experience: "6 yrs • Design systems",
-        appliedAt: "3h ago",
-        status: "shortlisted",
-      },
-      {
-        name: "Aung Htet",
-        role: "Product Designer @ ShopLink",
-        experience: "4 yrs • B2B dashboards",
-        appliedAt: "4h ago",
-        status: "reviewing",
-      },
-    ],
-  },
-  {
-    id: "3",
-    title: "Technical Recruiter (APAC)",
-    company: "Vertex Talent",
-    location: "Yangon",
-    job_type: "On-site",
-    posted: "1w ago",
-    applicants: [
-      {
-        name: "Thiri Moe",
-        role: "Talent Partner @ Spark",
-        experience: "4 yrs • Tech roles",
-        appliedAt: "3d ago",
-        status: "reviewing",
-      },
-      {
-        name: "Daniel Wong",
-        role: "Recruiter @ Horizon",
-        experience: "5 yrs • Regional hiring",
-        appliedAt: "5d ago",
-        status: "rejected",
-      },
-    ],
-  },
-  {
-    id: "4",
-    title: "Backend Engineer (Node.js)",
-    company: "BrightForge",
-    location: "Remote",
-    job_type: "Remote",
-    posted: "3d ago",
-    applicants: [
-      {
-        name: "Luis Ortega",
-        role: "Backend Engineer @ Scale",
-        experience: "6 yrs • Node / Postgres",
-        appliedAt: "2d ago",
-        status: "reviewing",
-      },
-    ],
-  },
-  {
-    id: "5",
-    title: "Marketing Manager",
-    company: "Northwind Co.",
-    location: "Singapore • Hybrid",
-    job_type: "Hybrid",
-    posted: "4d ago",
-    applicants: [],
-  },
-  {
-    id: "6",
-    title: "Data Analyst",
-    company: "InsightWorks",
-    location: "Remote",
-    job_type: "Remote",
-    posted: "1d ago",
-    applicants: [
-      {
-        name: "Emily Stone",
-        role: "Data Analyst @ Clarity",
-        experience: "3 yrs • SQL / Looker",
-        appliedAt: "10h ago",
-        status: "shortlisted",
-      },
-      {
-        name: "Min Ko",
-        role: "BI Analyst @ WaveMoney",
-        experience: "4 yrs • PowerBI",
-        appliedAt: "8h ago",
-        status: "reviewing",
-      },
-    ],
-  },
-  {
-    id: "7",
-    title: "Customer Success Lead",
-    company: "NimbusHQ",
-    location: "Bangkok • Hybrid",
-    job_type: "Hybrid",
-    posted: "6d ago",
-    applicants: [
-      {
-        name: "Grace Lee",
-        role: "CSM @ Pilot",
-        experience: "5 yrs • Enterprise",
-        appliedAt: "2d ago",
-        status: "reviewing",
-      },
-    ],
-  },
-  {
-    id: "8",
-    title: "Mobile Engineer (React Native)",
-    company: "Aurora Labs",
-    location: "Remote",
-    job_type: "Remote",
-    posted: "1d ago",
-    applicants: [
-      {
-        name: "Aye Chan",
-        role: "Mobile Engineer @ Grab",
-        experience: "5 yrs • RN / Expo",
-        appliedAt: "1d ago",
-        status: "shortlisted",
-      },
-      {
-        name: "Jonathan Park",
-        role: "Mobile Dev @ Nova",
-        experience: "3 yrs • RN / CI/CD",
-        appliedAt: "16h ago",
-        status: "reviewing",
-      },
-    ],
-  },
-  {
-    id: "9",
-    title: "QA Engineer",
-    company: "BrightForge",
-    location: "Yangon",
-    job_type: "On-site",
-    posted: "2w ago",
-    applicants: [
-      {
-        name: "Thiha Tun",
-        role: "QA Analyst @ Wave",
-        experience: "4 yrs • Cypress / Playwright",
-        appliedAt: "5d ago",
-        status: "reviewing",
-      },
-    ],
-  },
-];
-
 const statusStyles: Record<Applicant["status"], string> = {
-  reviewing: "bg-slate-100 text-slate-700 border-slate-200",
-  shortlisted: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  submitted: "bg-blue-50 text-blue-700 border-blue-200",
+  reviewed: "bg-slate-100 text-slate-700 border-slate-200",
+  accepted: "bg-emerald-50 text-emerald-700 border-emerald-200",
   rejected: "bg-rose-50 text-rose-700 border-rose-200",
+};
+
+const normalizeStatus = (status?: string): Applicant["status"] => {
+  const value = status?.toLowerCase();
+  if (value === "submitted") return "submitted";
+  if (value === "reviewed" || value === "reviewing") return "reviewed";
+  if (value === "accepted" || value === "shortlisted") return "accepted";
+  if (value === "rejected") return "rejected";
+  return "submitted";
 };
 
 const MyJobs = () => {
@@ -250,8 +74,7 @@ const MyJobs = () => {
   const [jobs, setJobs] = useState<RecruiterJob[]>([]);
   const [selectedJob, setSelectedJob] = useState<RecruiterJob | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-
-  console.log("user.jobPosts :>> ", user);
+  const isLiveData = Boolean(user?.jobPosts && user.jobPosts.length > 0);
 
   const initials = (name: string) =>
     name
@@ -279,7 +102,20 @@ const MyJobs = () => {
         location: job.location || "Not specified",
         job_type: job.jobType || "fulltime",
         posted: new Date(job.createdAt).toLocaleDateString(),
-        applicants: [],
+        applicants:
+          job.applications?.map((application, index) => ({
+            id: application.id,
+            researcherId: application.researcherId,
+            name:
+              (application as any)?.researcher?.name ||
+              application.researcherId?.slice(0, 8) ||
+              `Applicant ${index + 1}`,
+            role: (application as any)?.researcher?.headline || "Researcher",
+            experience: (application as any)?.researcher?.experience || "",
+            appliedAt: new Date(application.createdAt).toLocaleDateString(),
+            status: normalizeStatus(application.status),
+            resumeUrl: (application as any)?.researcher?.resumeUrl,
+          })) || [],
       }));
       setJobs(mapped);
     }
@@ -296,21 +132,29 @@ const MyJobs = () => {
     );
   }, [searchTerm, selectedJob]);
 
-  const handleStatusChange = (
+  const handleStatusChange = async (
     jobId: string,
-    applicantName: string,
+    applicant: Applicant,
     status: Applicant["status"]
   ) => {
+    const prevJobs = jobs;
+    const updateApplicants = (list: Applicant[]) =>
+      list.map((item) =>
+        item.id
+          ? item.id === applicant.id
+            ? { ...item, status }
+            : item
+          : item.name === applicant.name
+          ? { ...item, status }
+          : item
+      );
+
     setJobs((prev) =>
       prev.map((job) =>
         job.id === jobId
           ? {
               ...job,
-              applicants: job.applicants.map((applicant) =>
-                applicant.name === applicantName
-                  ? { ...applicant, status }
-                  : applicant
-              ),
+              applicants: updateApplicants(job.applicants),
             }
           : job
       )
@@ -320,16 +164,42 @@ const MyJobs = () => {
       if (!prev || prev.id !== jobId) return prev;
       return {
         ...prev,
-        applicants: prev.applicants.map((applicant) =>
-          applicant.name === applicantName
-            ? { ...applicant, status }
-            : applicant
-        ),
+        applicants: updateApplicants(prev.applicants),
       };
     });
+
+    if (!isLiveData) {
+      showToast("info", t("demoUpdate"));
+      return;
+    }
+
+    if (!applicant.id) {
+      showToast("error", t("statusUpdateFailed"));
+      return;
+    }
+
+    try {
+      await updateApplicationStatus(applicant.id, status);
+      showToast("success", t("statusUpdated"));
+    } catch (error: any) {
+      console.error("Failed to update status", error);
+      setJobs(prevJobs);
+      const prevSelected = prevJobs.find((job) => job.id === jobId) || null;
+      setSelectedJob(prevSelected);
+      showToast(
+        "error",
+        error?.response?.data?.message || t("statusUpdateFailed")
+      );
+    }
   };
 
   const handleDeleteJob = async (jobId: string) => {
+    if (!isLiveData) {
+      setJobs((prev) => prev.filter((job) => job.id !== jobId));
+      setSelectedJob(null);
+      showToast("info", t("demoDelete"));
+      return;
+    }
     try {
       await deleteJobPosting(jobId);
       setJobs((prev) => prev.filter((job) => job.id !== jobId));
@@ -353,7 +223,7 @@ const MyJobs = () => {
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="rounded-full border-dashed">
-              {t("demoBadge")}
+              {isLiveData ? t("liveBadge") : t("demoBadge")}
             </Badge>
             <Badge variant="secondary" className="rounded-full">
               {t("applicantsCount", { count: totalApplicants })}
@@ -488,6 +358,16 @@ const MyJobs = () => {
                           <p className="text-xs text-muted-foreground">
                             {applicant.experience}
                           </p>
+                          {applicant.resumeUrl && (
+                            <a
+                              href={applicant.resumeUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-xs text-primary underline"
+                            >
+                              {t("viewResume")}
+                            </a>
+                          )}
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-2 text-xs text-muted-foreground">
@@ -496,15 +376,16 @@ const MyJobs = () => {
                           onValueChange={(value) =>
                             handleStatusChange(
                               selectedJob.id,
-                              applicant.name,
+                              applicant,
                               value as Applicant["status"]
                             )
                           }
                         >
                           <SelectTrigger
                             size="sm"
-                            className={`rounded-full border-none  ${
-                              statusStyles[applicant.status]
+                            className={`rounded-full border-none ${
+                              statusStyles[applicant.status] ??
+                              "bg-secondary text-secondary-foreground"
                             }`}
                           >
                             <SelectValue aria-label={applicant.status}>
@@ -514,11 +395,14 @@ const MyJobs = () => {
                             </SelectValue>
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="reviewing">
-                              {t("status.reviewing")}
+                            <SelectItem value="submitted">
+                              {t("status.submitted")}
                             </SelectItem>
-                            <SelectItem value="shortlisted">
-                              {t("status.shortlisted")}
+                            <SelectItem value="reviewed">
+                              {t("status.reviewed")}
+                            </SelectItem>
+                            <SelectItem value="accepted">
+                              {t("status.accepted")}
                             </SelectItem>
                             <SelectItem value="rejected">
                               {t("status.rejected")}

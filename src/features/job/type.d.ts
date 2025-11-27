@@ -12,6 +12,9 @@ export interface Job {
   status?: string;
   companyIndustry?: string;
   applicationsCount?: number;
+  hasApplied?: boolean;
+  isSaved?: boolean;
+  savedJobId?: string | null;
 }
 
 export interface Recruiter {

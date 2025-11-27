@@ -56,7 +56,7 @@ const Company = () => {
     } catch (error: any) {
       console.error("Failed to create company", error);
       showToast(
-        "destructive",
+        "error",
         error?.response?.data?.message || "Failed to create company."
       );
     } finally {
@@ -67,16 +67,12 @@ const Company = () => {
   return (
     <Card>
       <CardHeader>
-        <h1 className="text-md font-semibold text-foreground">
-          {t("title")}
-        </h1>
+        <h1 className="text-md font-semibold text-foreground">{t("title")}</h1>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="flex flex-col">
-            <label className="mb-1 font-medium text-sm">
-              {t("nameLabel")}
-            </label>
+            <label className="mb-1 font-medium text-sm">{t("nameLabel")}</label>
             <input
               {...register("name")}
               type="text"

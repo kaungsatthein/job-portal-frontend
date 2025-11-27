@@ -4,6 +4,7 @@ import { CompanyOption } from "../types/jobs.type";
 type ApiCompany = {
   id?: string;
   name?: string;
+  status?: string;
 };
 
 export const fetchCompanies = async (): Promise<CompanyOption[]> => {
@@ -15,6 +16,7 @@ export const fetchCompanies = async (): Promise<CompanyOption[]> => {
   }
 
   return companies
+    .filter((company: ApiCompany) => company.status === "open")
     .map((company: ApiCompany) => ({
       id: company.id ?? "",
       name: company.name ?? "Unnamed company",

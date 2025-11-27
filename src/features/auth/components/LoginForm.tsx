@@ -105,8 +105,7 @@ const LoginForm = () => {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
-  const { user, isLoading, signOut, refreshUser, role, isFirstLogin } =
-    useAuth();
+  const { user, isLoading, signOut, refreshUser, role } = useAuth();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [profile, setProfile] = useState({
     avatar_url: "",
@@ -124,6 +123,8 @@ const LoginForm = () => {
     "all" | "unread"
   >("all");
   const [showWelcome, setShowWelcome] = useState(false);
+
+  console.log("showWelcome :>> ", showWelcome);
   const [isUploadingResume, setIsUploadingResume] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>([
     {
@@ -324,10 +325,10 @@ const LoginForm = () => {
   }, [user]);
 
   useEffect(() => {
-    if (user && isFirstLogin) {
+    if (user?.loginCount === 1) {
       setShowWelcome(true);
     }
-  }, [user, isFirstLogin]);
+  }, [user]);
 
   console.log("profile :>> ", profile);
 
@@ -553,12 +554,12 @@ const LoginForm = () => {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onSelect={() => setIsEditOpen(true)}>
-              <User className="w-4 h-4" />
-              Edit Profile
-            </DropdownMenuItem>
             {role !== "recruiter" && (
               <>
+                <DropdownMenuItem onSelect={() => setIsEditOpen(true)}>
+                  <User className="w-4 h-4" />
+                  Edit Profile
+                </DropdownMenuItem>
                 <DropdownMenuItem onSelect={goToApplicationStatus}>
                   <FileText className="w-4 h-4" />
                   Application Status
@@ -567,9 +568,9 @@ const LoginForm = () => {
                   <BookmarkCheck className="w-4 h-4" />
                   Saved Jobs
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
               </>
             )}
-            <DropdownMenuSeparator />
             <DropdownMenuItem variant="destructive" onSelect={handleLogout}>
               <LogOut className="w-4 h-4" />
               Logout

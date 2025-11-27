@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+} from "react";
 import { logout } from "../services/auth";
 import apiInstance from "@/lib/api-config/instance";
 
@@ -22,6 +29,7 @@ export type AuthUser = {
   provider: string;
   role: string[] | string;
   loginCount: number;
+  resumeUrl: string;
   jobPosts?: Array<{
     id: string;
     companyId: string | null;
@@ -33,6 +41,40 @@ export type AuthUser = {
     status: string;
     createdAt: string;
     company?: { name?: string } | null;
+    applications?: Array<{
+      id: string;
+      researcherId: string;
+      status: string;
+      createdAt: string;
+      researcher?: {
+        name?: string;
+        headline?: string;
+        experience?: string;
+      };
+    }>;
+  }>;
+  applications?: Array<{
+    id: string;
+    jobId: string;
+    status: string;
+    createdAt: string;
+  }>;
+  savedJobs?: Array<{
+    id: string;
+    jobId: string;
+    createdAt: string;
+    job?: {
+      id: string;
+      title: string;
+      description: string;
+      jobType: string;
+      location: string;
+      salaryRange: string;
+      status: string;
+      createdAt: string;
+      company?: { name?: string; industryId?: string } | null;
+      recruiter?: { name?: string } | null;
+    };
   }>;
 } | null;
 
@@ -54,9 +96,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [error, setError] = useState<string | null>(null);
   const [isFirstLogin, setIsFirstLogin] = useState(false);
 
-  const fetchMe = async () => {
+  /**
+   * 🟦 STABLE fetchMe with useCallback
+   */
+  const fetchMe = useCallback(async () => {
     setIsLoading(true);
     setError(null);
+
     try {
       if (typeof window === "undefined") {
         setUser(null);
@@ -70,10 +116,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       const res: any = await apiInstance.get(`${BASE_URL}/auth/me`);
-      console.log("res :>> ", res);
       const userData = res?.data?.data ?? res?.data ?? null;
+
       setUser(userData);
-      setIsFirstLogin(Boolean(userData?.loginCount === 1));
+      setIsFirstLogin(userData?.loginCount === 1);
     } catch (err: any) {
       setError(err?.response?.status === 401 ? null : "Unable to fetch user");
       setUser(null);
@@ -81,41 +127,51 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchMe();
-  }, []);
+  }, [fetchMe]);
 
-  const signOut = async () => {
+  /**
+   * 🟥 STABLE signOut with useCallback
+   */
+  const signOut = useCallback(async () => {
     try {
       await logout();
     } catch (err) {
       console.error("Logout failed", err);
     } finally {
       setUser(null);
+
       if (typeof window !== "undefined") {
         localStorage.removeItem(ACCESS_TOKEN_KEY);
         localStorage.removeItem(REFRESH_TOKEN_KEY);
       }
+
       window.location.href = "/";
     }
-  };
+  }, []);
 
-  const value = useMemo<AuthContextValue>(
-    () => ({
+  /**
+   * 🟩 Memoized context value
+   * Only recalculates when dependencies change.
+   */
+  const value = useMemo<AuthContextValue>(() => {
+    const extractedRole = Array.isArray(user?.role)
+      ? user.role[0] ?? null
+      : user?.role ?? null;
+
+    return {
       user,
       isLoading,
       error,
       isFirstLogin,
-      role: Array.isArray((user as any)?.role)
-        ? ((user as any).role as string[])[0] ?? null
-        : (user as any)?.role ?? null,
+      role: extractedRole,
       refreshUser: fetchMe,
       signOut,
-    }),
-    [user, isLoading, error, isFirstLogin]
-  );
+    };
+  }, [user, isLoading, error, isFirstLogin, fetchMe, signOut]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

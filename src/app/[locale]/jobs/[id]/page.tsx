@@ -1,5 +1,6 @@
 import { JobDetailCard } from "@/features/job";
 import { fetchJobPosting } from "@/features/job/services/job-postings";
+import { fetchSavedJobs } from "@/features/job/services/saved-jobs";
 import { Job, JobPosting } from "@/features/job/type";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -51,6 +52,7 @@ const mapJobPostingToJob = (posting: JobPosting): Job => ({
   status: posting.status,
   companyIndustry: posting.company?.industryId,
   applicationsCount: posting.applications?.length ?? 0,
+  isSaved: Boolean((posting as any)?.isSaved),
 });
 
 export default async function JobDetailPage({
@@ -62,7 +64,37 @@ export default async function JobDetailPage({
 
   try {
     const jobPosting = await fetchJobPosting(id);
-    const job = mapJobPostingToJob(jobPosting);
+    let savedId: string | null = null;
+    try {
+      const savedResponse = await fetchSavedJobs();
+      const savedRecords = Array.isArray(savedResponse)
+        ? savedResponse
+        : Array.isArray(savedResponse?.savedJobs)
+        ? savedResponse.savedJobs
+        : Array.isArray(savedResponse?.data)
+        ? savedResponse.data
+        : [];
+      const savedRecord =
+        savedRecords.find(
+          (record: any) =>
+            record?.id === jobPosting.id ||
+            record?.jobId === jobPosting.id ||
+            record?.job?.id === jobPosting.id
+        ) || null;
+      if (savedRecord) {
+        savedId = savedRecord.id || savedRecord.jobId || jobPosting.id;
+      }
+    } catch (error: any) {
+      if (error?.response?.status !== 401) {
+        console.error("Failed to fetch saved jobs", error);
+      }
+    }
+
+    const job: Job = {
+      ...mapJobPostingToJob(jobPosting),
+      isSaved: Boolean(savedId),
+      savedJobId: savedId || undefined,
+    };
 
     return (
       <div className="mx-4 lg:mx-8 my-6 space-y-4">
