@@ -1,4 +1,9 @@
-export type Stage = "applied" | "reviewing" | "interview" | "offer" | "declined";
+export type Stage =
+  | "applied"
+  | "reviewing"
+  | "interview"
+  | "offer"
+  | "declined";
 export type Actor = "recruiter" | "researcher" | "system";
 
 export type TimelineEntry = {
@@ -151,7 +156,8 @@ export const applications: Application[] = [
       },
       {
         title: "Case study submitted",
-        description: "Delivered cohort analysis and anomaly detection write-up.",
+        description:
+          "Delivered cohort analysis and anomaly detection write-up.",
         time: "Aug 09 • 11:10 AM",
         actor: "researcher",
         state: "done",

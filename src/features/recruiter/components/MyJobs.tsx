@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/features/auth";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +19,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Briefcase, Globe2, Search, UploadCloud, Users } from "lucide-react";
+import {
+  Briefcase,
+  Globe2,
+  Search,
+  UploadCloud,
+  Users,
+  Trash2,
+} from "lucide-react";
+import { deleteJobPosting } from "@/features/job/services/job-postings";
+import { showToast } from "@/lib";
 
 type Applicant = {
   name: string;
@@ -236,9 +246,12 @@ const statusStyles: Record<Applicant["status"], string> = {
 
 const MyJobs = () => {
   const t = useTranslations("RecruiterMyJobs");
-  const [jobs, setJobs] = useState<RecruiterJob[]>(demoJobs);
+  const { user } = useAuth();
+  const [jobs, setJobs] = useState<RecruiterJob[]>([]);
   const [selectedJob, setSelectedJob] = useState<RecruiterJob | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+
+  console.log("user.jobPosts :>> ", user);
 
   const initials = (name: string) =>
     name
@@ -256,6 +269,21 @@ const MyJobs = () => {
   useEffect(() => {
     setSearchTerm("");
   }, [selectedJob]);
+
+  useEffect(() => {
+    if (user?.jobPosts && user.jobPosts.length > 0) {
+      const mapped: RecruiterJob[] = user.jobPosts.map((job) => ({
+        id: job.id,
+        title: job.title,
+        company: job.company?.name || "Untitled company",
+        location: job.location || "Not specified",
+        job_type: job.jobType || "fulltime",
+        posted: new Date(job.createdAt).toLocaleDateString(),
+        applicants: [],
+      }));
+      setJobs(mapped);
+    }
+  }, [user]);
 
   const filteredApplicants = useMemo(() => {
     if (!selectedJob) return [];
@@ -299,6 +327,18 @@ const MyJobs = () => {
         ),
       };
     });
+  };
+
+  const handleDeleteJob = async (jobId: string) => {
+    try {
+      await deleteJobPosting(jobId);
+      setJobs((prev) => prev.filter((job) => job.id !== jobId));
+      setSelectedJob(null);
+      showToast("success", t("deleteSuccess"));
+    } catch (error: any) {
+      console.error("Failed to delete job", error);
+      showToast("error", error?.response?.data?.message || t("deleteFailed"));
+    }
   };
 
   return (
@@ -355,11 +395,23 @@ const MyJobs = () => {
                   <Briefcase className="h-4 w-4" />
                   <span>{job.job_type}</span>
                 </div>
-                <div className="flex items-center gap-2 rounded-full bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
-                  <Users className="h-4 w-4" />
-                  <span>
-                    {t("applicantsCount", { count: job.applicants.length })}
-                  </span>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 rounded-full bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
+                    <Users className="h-4 w-4" />
+                    <span>
+                      {t("applicantsCount", { count: job.applicants.length })}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    className="text-muted-foreground hover:text-destructive"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteJob(job.id);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
             </button>

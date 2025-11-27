@@ -158,6 +158,8 @@
     "noApplicants": "No one has applied yet.",
     "searchPlaceholder": "Search applicants by name or role",
     "noSearchResults": "No applicants match your search.",
+    "deleteSuccess": "Job deleted.",
+    "deleteFailed": "Unable to delete job.",
     "status": {
       "reviewing": "Reviewing",
       "shortlisted": "Shortlisted",

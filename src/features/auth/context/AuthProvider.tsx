@@ -20,8 +20,20 @@ export type AuthUser = {
   name: string;
   avatar_url: string;
   provider: string;
-  role: string[];
+  role: string[] | string;
   loginCount: number;
+  jobPosts?: Array<{
+    id: string;
+    companyId: string | null;
+    title: string;
+    description: string;
+    jobType: string;
+    location: string;
+    salaryRange: string;
+    status: string;
+    createdAt: string;
+    company?: { name?: string } | null;
+  }>;
 } | null;
 
 type AuthContextValue = {
@@ -58,6 +70,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       const res: any = await apiInstance.get(`${BASE_URL}/auth/me`);
+      console.log("res :>> ", res);
       const userData = res?.data?.data ?? res?.data ?? null;
       setUser(userData);
       setIsFirstLogin(Boolean(userData?.loginCount === 1));

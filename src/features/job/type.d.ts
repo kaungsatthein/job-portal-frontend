@@ -91,3 +91,9 @@ export interface JobPostingResponse {
   data: JobPosting;
   timestamp: string;
 }
+
+export interface DeleteJobPostingResponse {
+  statusCode: number;
+  message: string;
+  timestamp: string;
+}

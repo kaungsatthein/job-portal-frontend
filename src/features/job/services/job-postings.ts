@@ -4,6 +4,7 @@ import {
   JobPostingResponse,
   JobPostingsResponse,
   CreateJobPostingPayload,
+  DeleteJobPostingResponse,
 } from "../type";
 
 interface FetchJobPostingsParams {
@@ -50,10 +51,16 @@ export const fetchJobPosting = async (id: string): Promise<JobPosting> => {
 export const createJobPosting = async (
   payload: CreateJobPostingPayload
 ): Promise<JobPosting> => {
-  console.log("payload :>> ", payload);
   const response = await apiInstance.post<JobPostingResponse>(
     "/job-postings",
     payload
   );
   return response.data.data;
+};
+
+export const deleteJobPosting = async (id: string) => {
+  const response = await apiInstance.delete<DeleteJobPostingResponse>(
+    `/job-postings/${id}`
+  );
+  return response.data;
 };
