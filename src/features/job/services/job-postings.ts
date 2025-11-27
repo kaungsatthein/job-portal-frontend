@@ -1,7 +1,10 @@
-"use server";
-
 import apiInstance from "@/lib/api-config/instance";
-import { JobPosting, JobPostingResponse, JobPostingsResponse } from "../type";
+import {
+  JobPosting,
+  JobPostingResponse,
+  JobPostingsResponse,
+  CreateJobPostingPayload,
+} from "../type";
 
 interface FetchJobPostingsParams {
   search?: string;
@@ -40,6 +43,17 @@ export const fetchJobPostings = async ({
 export const fetchJobPosting = async (id: string): Promise<JobPosting> => {
   const response = await apiInstance.get<JobPostingResponse>(
     `/job-postings/${id}`
+  );
+  return response.data.data;
+};
+
+export const createJobPosting = async (
+  payload: CreateJobPostingPayload
+): Promise<JobPosting> => {
+  console.log("payload :>> ", payload);
+  const response = await apiInstance.post<JobPostingResponse>(
+    "/job-postings",
+    payload
   );
   return response.data.data;
 };

@@ -33,7 +33,8 @@ type StepPositionProps = {
   control: Control<JobFormValues>;
   setTab: (tab: string) => void;
   selectedCompany?: CompanyOption;
-  mockCompanies: CompanyOption[];
+  companies: CompanyOption[];
+  companiesLoading?: boolean;
 };
 
 const StepPosition = ({
@@ -42,7 +43,8 @@ const StepPosition = ({
   control,
   setTab,
   selectedCompany,
-  mockCompanies,
+  companies,
+  companiesLoading,
 }: StepPositionProps) => {
   const t = useTranslations("PostJob");
 
@@ -96,8 +98,14 @@ const StepPosition = ({
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-3 py-4">
-                {mockCompanies.length > 0 ? (
-                  mockCompanies.map((company) => (
+                {companiesLoading ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">
+                      {t("stepPosition.loadingCompanies")}
+                    </p>
+                  </div>
+                ) : companies.length > 0 ? (
+                  companies.map((company) => (
                     <Controller
                       key={company.id}
                       name="companyId"
@@ -135,7 +143,7 @@ const StepPosition = ({
                   </div>
                 )}
               </div>
-              {mockCompanies.length > 0 && (
+              {!companiesLoading && companies.length > 0 && (
                 <div className="border-t pt-4">
                   <Button
                     type="button"

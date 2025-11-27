@@ -17,7 +17,19 @@
     "loginWithRecruiter": "အလုပ်ခေါ်ယူသူအဖြစ် လော့ဂ်အင်",
     "loginWithResearcher": "အလုပ်ရှာဖွေသူအဖြစ် လော့ဂ်အင်",
     "loginSuccess": "လော့ဂ်အင် အောင်မြင်ပါသည်။",
-    "loginFailed": "လော့ဂ်အင် မအောင်မြင်ပါ၊ ထပ်မံကြိုးစားပေးပါ။"
+    "loginFailed": "လော့ဂ်အင် မအောင်မြင်ပါ၊ ထပ်မံကြိုးစားပေးပါ။",
+    "welcomeTitle": "{name} ကို ကြိုဆိုပါတယ်",
+    "welcomeRecruiter": "Recruiter အဖြစ်ပါဝင်သည့်အတွက် ကျေးဇူးတင်ပါသည်။ အလုပ်များတင်ပြီး လုပ်ခလျာများနှင့် ဆက်သွယ်လိုက်ပါ။",
+    "welcomeResearcher": "သင့်ကိုတွေ့ရတာ ဝမ်းမြောက်ပါတယ်။ Recruiter များအတွက် ပိုမိုလေ့လာနိုင်ရန် သင့်ပရိုဖိုင်ကို အပ်ဒိတ်လုပ်ပါ။",
+    "updateProfile": "အချက်အလက် ပြင်ဆင်ရန်",
+    "continue": "ရှေ့သို့",
+    "profileUpdated": "ပရိုဖိုင်ကို အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ။",
+    "profileUpdateFailed": "ပရိုဖိုင်ကို ပြင်ဆင်၍ မရပါ။",
+    "resumeUploaded": "Resume ကို အပ်လိုက်ပြီ။",
+    "resumeUploadFailed": "Resume ကို အပ်ရန် မအောင်မြင်ပါ။",
+    "resumeCurrent": "လက်ရှိ Resume:",
+    "viewResume": "ကြည့်ရန်",
+    "resumeUploading": "Resume ကို အပ်လုပ်နေပါသည်..."
   },
   "Home": {
     "searchPrompt": "အလုပ် <count>{value}</count> ခုကို ယခုပဲ ရှာဖွေပါ"
@@ -182,6 +194,7 @@
       "selectCompanyTitle": "ကုမ္ပဏီ ရွေးချယ်ပါ",
       "selectCompanyDescription": "ဤအလုပ်ဖေါ်ပြချက်အတွက် ကုမ္ပဏီကို ရွေးပါ",
       "noCompanies": "ကုမ္ပဏီ မတွေ့ရှိပါ",
+      "loadingCompanies": "ကုမ္ပဏီများ ယခုတင်ယူနေသည်...",
       "createCompany": "ကုမ္ပဏီ ဖန်တီးရန်",
       "createNewCompany": "ကုမ္ပဏီအသစ် ဖန်တီးရန်"
     },

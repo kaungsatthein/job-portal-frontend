@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button } from "@/components/ui/button";
@@ -13,24 +13,18 @@ import StepDetail from "./steps/StepDetail";
 import { showToast } from "@/lib";
 import { useTranslations } from "next-intl";
 import { AnyObjectSchema } from "yup";
-
-const mockCompanies: CompanyOption[] = [
-  { id: "1", name: "Tech Corp" },
-  { id: "2", name: "Innovation Labs" },
-  { id: "3", name: "Digital Solutions Inc" },
-];
+import { createJobPosting } from "@/features/job/services/job-postings";
+import { useAuth } from "@/features/auth";
+import { fetchCompanies } from "../services/company";
 
 const PostJobs = ({ setTab }: { setTab: (tab: string) => void }) => {
   const [step, setStep] = useState(1);
   const t = useTranslations("PostJob");
-  const step1Schema = useMemo<AnyObjectSchema>(
-    () => createStep1Schema(t),
-    [t]
-  );
-  const step2Schema = useMemo<AnyObjectSchema>(
-    () => createStep2Schema(t),
-    [t]
-  );
+  const step1Schema = useMemo<AnyObjectSchema>(() => createStep1Schema(t), [t]);
+  const step2Schema = useMemo<AnyObjectSchema>(() => createStep2Schema(t), [t]);
+
+  const { user } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
@@ -38,6 +32,7 @@ const PostJobs = ({ setTab }: { setTab: (tab: string) => void }) => {
     control,
     watch,
     trigger,
+    reset,
     formState: { errors },
   } = useForm<JobFormValues>({
     resolver: yupResolver(step === 1 ? step1Schema : step2Schema),
@@ -53,9 +48,29 @@ const PostJobs = ({ setTab }: { setTab: (tab: string) => void }) => {
   });
 
   const formValues = watch();
-  const selectedCompany = mockCompanies.find(
+  const [companies, setCompanies] = useState<CompanyOption[]>([]);
+  const [companiesLoading, setCompaniesLoading] = useState(false);
+
+  const selectedCompany = companies.find(
     (company) => company.id === formValues.companyId
   );
+
+  useEffect(() => {
+    const loadCompanies = async () => {
+      setCompaniesLoading(true);
+      try {
+        const data = await fetchCompanies();
+        setCompanies(data);
+      } catch (error) {
+        console.error("Failed to load companies", error);
+        showToast("error", t("stepPosition.noCompanies"));
+      } finally {
+        setCompaniesLoading(false);
+      }
+    };
+
+    loadCompanies();
+  }, [t]);
 
   const handleNext = async () => {
     const fields: (keyof JobFormValues)[] =
@@ -67,10 +82,37 @@ const PostJobs = ({ setTab }: { setTab: (tab: string) => void }) => {
     if (valid) setStep(step + 1);
   };
 
-  const onSubmit = (data: JobFormValues) => {
-    console.log("Job created:", data);
-    // alert("Job posted successfully!");
-    showToast("success", t("toast.created"));
+  const onSubmit = async (data: JobFormValues) => {
+    if (!user || typeof user !== "object" || !(user as any)?.id) {
+      showToast("error", "Unable to post job without recruiter account.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await createJobPosting({
+        recruiterId: (user as any).id,
+        companyId: data.companyId,
+        title: data.title,
+        description: data.description,
+        jobType: data.jobType || "fulltime",
+        location: data.location,
+        salaryRange: data.salaryRange,
+        status: "pending",
+      });
+      showToast("success", t("toast.created"));
+      reset();
+      setStep(1);
+      setTab("myJobs");
+    } catch (error: any) {
+      console.error("Failed to create job posting", error);
+      showToast(
+        "error",
+        error?.response?.data?.message || "Failed to create job posting."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -94,7 +136,8 @@ const PostJobs = ({ setTab }: { setTab: (tab: string) => void }) => {
             control={control}
             setTab={setTab}
             selectedCompany={selectedCompany}
-            mockCompanies={mockCompanies}
+            companies={companies}
+            companiesLoading={companiesLoading}
           />
         )}
 
@@ -124,8 +167,12 @@ const PostJobs = ({ setTab }: { setTab: (tab: string) => void }) => {
               {t("actions.next")}
             </Button>
           ) : (
-            <Button type="button" onClick={handleSubmit(onSubmit)}>
-              {t("actions.post")}
+            <Button
+              type="button"
+              onClick={handleSubmit(onSubmit)}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? `${t("actions.post")}...` : t("actions.post")}
             </Button>
           )}
         </div>

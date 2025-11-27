@@ -61,20 +61,14 @@ const StepDetail = ({ register, errors, control }: StepDetailProps) => {
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="FULL_TIME">
+                  <SelectItem value="fulltime">
                     {t("stepDetail.jobTypeOptions.fullTime")}
                   </SelectItem>
-                  <SelectItem value="PART_TIME">
+                  <SelectItem value="parttime">
                     {t("stepDetail.jobTypeOptions.partTime")}
                   </SelectItem>
-                  <SelectItem value="CONTRACT">
+                  <SelectItem value="contract">
                     {t("stepDetail.jobTypeOptions.contract")}
-                  </SelectItem>
-                  <SelectItem value="INTERNSHIP">
-                    {t("stepDetail.jobTypeOptions.internship")}
-                  </SelectItem>
-                  <SelectItem value="REMOTE">
-                    {t("stepDetail.jobTypeOptions.remote")}
                   </SelectItem>
                 </SelectContent>
               </Select>

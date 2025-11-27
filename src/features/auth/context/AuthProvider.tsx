@@ -14,13 +14,22 @@ const BASE_URL = (
   process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001"
 ).trim();
 
-type AuthUser = Record<string, unknown> | null;
+export type AuthUser = {
+  id: string;
+  email: string;
+  name: string;
+  avatar_url: string;
+  provider: string;
+  role: string[];
+  loginCount: number;
+} | null;
 
 type AuthContextValue = {
   user: AuthUser;
   isLoading: boolean;
   error: string | null;
   role: string | null;
+  isFirstLogin: boolean;
   refreshUser: () => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -31,6 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<AuthUser>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isFirstLogin, setIsFirstLogin] = useState(false);
 
   const fetchMe = async () => {
     setIsLoading(true);
@@ -49,11 +59,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       const res: any = await apiInstance.get(`${BASE_URL}/auth/me`);
       const userData = res?.data?.data ?? res?.data ?? null;
-      console.log("res :>> ", res);
       setUser(userData);
+      setIsFirstLogin(Boolean(userData?.loginCount === 1));
     } catch (err: any) {
       setError(err?.response?.status === 401 ? null : "Unable to fetch user");
       setUser(null);
+      setIsFirstLogin(false);
     } finally {
       setIsLoading(false);
     }
@@ -74,6 +85,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         localStorage.removeItem(ACCESS_TOKEN_KEY);
         localStorage.removeItem(REFRESH_TOKEN_KEY);
       }
+      window.location.href = "/";
     }
   };
 
@@ -82,13 +94,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       user,
       isLoading,
       error,
+      isFirstLogin,
       role: Array.isArray((user as any)?.role)
         ? ((user as any).role as string[])[0] ?? null
         : (user as any)?.role ?? null,
       refreshUser: fetchMe,
       signOut,
     }),
-    [user, isLoading, error]
+    [user, isLoading, error, isFirstLogin]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

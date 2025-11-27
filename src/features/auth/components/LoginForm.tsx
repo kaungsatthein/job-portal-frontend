@@ -24,6 +24,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useLocale, useTranslations } from "next-intl";
 import { showToast } from "@/lib";
 import { useGoogleLogin } from "@/features/auth/queries/auth";
+import { updateProfile, uploadResume } from "@/features/auth/services/auth";
 import type { LoginRole } from "@/features/auth/services/auth";
 import {
   DropdownMenu,
@@ -35,6 +36,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -103,9 +105,9 @@ const LoginForm = () => {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
-  const { user, isLoading, signOut, refreshUser, role } = useAuth();
+  const { user, isLoading, signOut, refreshUser, role, isFirstLogin } =
+    useAuth();
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [cvName, setCvName] = useState<string | null>(null);
   const [profile, setProfile] = useState({
     avatar_url: "",
     name: "",
@@ -114,11 +116,15 @@ const LoginForm = () => {
     headline: "",
     location: "",
     bio: "",
+    birthDate: "",
+    resumeUrl: "",
     role: "",
   });
   const [notificationFilter, setNotificationFilter] = useState<
     "all" | "unread"
   >("all");
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [isUploadingResume, setIsUploadingResume] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>([
     {
       id: "1",
@@ -166,14 +172,69 @@ const LoginForm = () => {
     loginWithGoogle(role);
   };
 
+  console.log("profile :>> ", profile);
+
   const handleLogout = () => {
     signOut();
     showToast("success", "Logged out successfully");
   };
 
-  const handleProfileSave = () => {
-    showToast("success", "Profile updated (demo)");
-    setIsEditOpen(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+
+  const handleResumeUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setIsUploadingResume(true);
+    try {
+      const result = await uploadResume(file);
+      console.log("result :>> ", result);
+      const url = result?.url || result?.fileUrl || result?.path || result;
+      console.log("url :>> ", url);
+      if (typeof url === "string" && url.length > 0) {
+        setProfile((prev) => ({ ...prev, resumeUrl: url }));
+        showToast("success", t("resumeUploaded"));
+      } else {
+        showToast("error", t("resumeUploadFailed"));
+      }
+    } catch (error: any) {
+      console.error("Resume upload failed", error);
+      showToast(
+        "error",
+        error?.response?.data?.message || t("resumeUploadFailed")
+      );
+    } finally {
+      setIsUploadingResume(false);
+      event.target.value = "";
+    }
+  };
+
+  const handleProfileSave = async () => {
+    setIsSavingProfile(true);
+    try {
+      await updateProfile({
+        name: profile.name,
+        avatar_url: profile.avatar_url,
+        birthDate: profile.birthDate || undefined,
+        resumeUrl: profile.resumeUrl || undefined,
+        phoneNumber: profile.phone || undefined,
+        headline: profile.headline || undefined,
+        location: profile.location || undefined,
+        about: profile.bio || undefined,
+      });
+      showToast("success", t("profileUpdated"));
+      setIsEditOpen(false);
+      refreshUser();
+    } catch (error: any) {
+      console.error("Failed to update profile", error);
+      showToast(
+        "error",
+        error?.response?.data?.message || t("profileUpdateFailed")
+      );
+    } finally {
+      setIsSavingProfile(false);
+    }
   };
 
   const goToApplicationStatus = () => {
@@ -209,6 +270,15 @@ const LoginForm = () => {
         : notifications,
     [notificationFilter, notifications]
   );
+  const resumeFileName = useMemo(() => {
+    if (!profile.resumeUrl) return null;
+    try {
+      const url = new URL(profile.resumeUrl);
+      return url.pathname.split("/").pop();
+    } catch {
+      return profile.resumeUrl.split("/").pop();
+    }
+  }, [profile.resumeUrl]);
 
   const markNotificationRead = (id: string) => {
     setNotifications((prev) =>
@@ -242,14 +312,22 @@ const LoginForm = () => {
         avatar_url: u?.avatar_url ?? prev.avatar_url,
         name: u?.name ?? prev.name,
         email: u?.email ?? prev.email,
-        phone: u?.phone ?? prev.phone,
+        phone: u?.phoneNumber ?? prev.phone,
         headline: u?.headline ?? prev.headline,
         location: u?.location ?? prev.location,
-        bio: u?.bio ?? prev.bio,
+        bio: u?.about ?? prev.bio,
+        birthDate: u?.birthDate ?? prev.birthDate,
+        resumeUrl: u?.resumeUrl ?? prev.resumeUrl,
         role: u?.role ?? prev.role,
       }));
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user && isFirstLogin) {
+      setShowWelcome(true);
+    }
+  }, [user, isFirstLogin]);
 
   console.log("profile :>> ", profile);
 
@@ -261,9 +339,37 @@ const LoginForm = () => {
     );
   }
 
+  const closeWelcome = () => setShowWelcome(false);
+  const openProfileFromWelcome = () => {
+    setShowWelcome(false);
+    setIsEditOpen(true);
+  };
+
   if (user) {
     return (
       <div className="flex items-center gap-4">
+        <Dialog open={showWelcome} onOpenChange={setShowWelcome}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {t("welcomeTitle", { name: profile.name || "there" })}
+              </DialogTitle>
+              <DialogDescription>
+                {role === "recruiter"
+                  ? t("welcomeRecruiter")
+                  : t("welcomeResearcher")}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex flex-col sm:flex-row gap-2">
+              {role === "researcher" && (
+                <Button variant="outline" onClick={openProfileFromWelcome}>
+                  {t("updateProfile")}
+                </Button>
+              )}
+              <Button onClick={closeWelcome}>{t("continue")}</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button
@@ -520,6 +626,7 @@ const LoginForm = () => {
                       setProfile((prev) => ({ ...prev, email: e.target.value }))
                     }
                     placeholder="you@example.com"
+                    disabled
                   />
                 </div>
                 <div className="space-y-1">
@@ -551,6 +658,39 @@ const LoginForm = () => {
               </div>
 
               <div className="space-y-1">
+                <Label htmlFor="resumeUrl">Resume link</Label>
+                <Input
+                  id="resumeUrl"
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={handleResumeUpload}
+                  disabled={isUploadingResume}
+                />
+                {profile.resumeUrl && (
+                  <p className="text-xs text-muted-foreground break-all">
+                    {t("resumeCurrent")}
+                    {resumeFileName && (
+                      <span className="font-semibold"> {resumeFileName}</span>
+                    )}
+                    {", "}
+                    <a
+                      href={profile.resumeUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary underline"
+                    >
+                      {t("viewResume")}
+                    </a>
+                  </p>
+                )}
+                {isUploadingResume && (
+                  <p className="text-xs text-muted-foreground">
+                    {t("resumeUploading")}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-1">
                 <Label htmlFor="bio">About</Label>
                 <Textarea
                   id="bio"
@@ -562,39 +702,15 @@ const LoginForm = () => {
                   placeholder="Tell recruiters about yourself"
                 />
               </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <Label htmlFor="cv">Upload CV</Label>
-                <div className="flex items-center gap-3">
-                  <Input
-                    id="cv"
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    className="cursor-pointer"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      setCvName(file ? file.name : null);
-                    }}
-                  />
-                  {cvName && (
-                    <span className="text-sm text-muted-foreground truncate">
-                      {cvName}
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Accepted: PDF, DOC, DOCX. Max 10MB.
-                </p>
-              </div>
             </div>
 
             <DialogFooter className="mt-2">
               <Button variant="outline" onClick={() => setIsEditOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleProfileSave}>Save changes</Button>
+              <Button onClick={handleProfileSave} disabled={isSavingProfile}>
+                {isSavingProfile ? "Saving..." : "Save changes"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

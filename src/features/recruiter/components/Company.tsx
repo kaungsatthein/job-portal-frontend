@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useForm, Controller } from "react-hook-form";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { createCompanySchema } from "../schema/company";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { createCompany } from "../services/company";
 
 type CompanyFormValues = {
   name: string;
@@ -32,6 +33,7 @@ const demoIndustries = [
 const Company = () => {
   const t = useTranslations("Company");
   const companySchema = useMemo(() => createCompanySchema(t), [t]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     register,
     handleSubmit,
@@ -45,10 +47,21 @@ const Company = () => {
     },
   });
 
-  const onSubmit = (data: CompanyFormValues) => {
-    console.log("Company created:", data);
-    showToast("success", t("toastSuccess"));
-    reset();
+  const onSubmit = async (data: CompanyFormValues) => {
+    try {
+      setIsSubmitting(true);
+      await createCompany(data.name);
+      showToast("success", t("toastSuccess"));
+      reset();
+    } catch (error: any) {
+      console.error("Failed to create company", error);
+      showToast(
+        "destructive",
+        error?.response?.data?.message || "Failed to create company."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -104,8 +117,8 @@ const Company = () => {
             )}
           </div>
 
-          <Button type="submit" className="w-full">
-            {t("submit")}
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? `${t("submit")}...` : t("submit")}
           </Button>
         </form>
       </CardContent>

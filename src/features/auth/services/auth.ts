@@ -39,3 +39,30 @@ export async function logout() {
 export function getPermission() {
   return apiInstance.get("/user/permissions");
 }
+
+export type UpdateProfilePayload = {
+  name?: string;
+  avatar_url?: string;
+  birthDate?: string;
+  resumeUrl?: string;
+  phoneNumber?: string;
+  headline?: string;
+  location?: string;
+  about?: string;
+};
+
+export async function updateProfile(payload: UpdateProfilePayload) {
+  const response = await apiInstance.patch("/user/profile", payload);
+  return response.data;
+}
+
+export async function uploadResume(file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await apiInstance.post("/upload/single", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data?.data ?? response.data;
+}

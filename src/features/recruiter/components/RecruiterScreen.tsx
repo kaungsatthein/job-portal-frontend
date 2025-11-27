@@ -14,17 +14,15 @@ const RecruiterScreen = () => {
   return (
     <div className="mx-4 lg:mx-8">
       <div>
-        <h1 className="text-lg font-semibold text-foreground">
-          {t("title")}
-        </h1>
+        <h1 className="text-lg font-semibold text-foreground">{t("title")}</h1>
         <span className="text-muted-foreground text-sm">{t("subtitle")}</span>
       </div>
       <Tabs value={tab} onValueChange={setTab} className="w-full my-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="myJobs">{t("tabs.myJobs")}</TabsTrigger>
           <TabsTrigger value="postJobs">{t("tabs.create")}</TabsTrigger>
           <TabsTrigger value="myCompany">{t("tabs.company")}</TabsTrigger>
-          <TabsTrigger value="account">{t("tabs.account")}</TabsTrigger>
+          {/* <TabsTrigger value="account">{t("tabs.account")}</TabsTrigger> */}
         </TabsList>
         <TabsContent value="myJobs" className="mt-3">
           <MyJobs />
@@ -35,9 +33,9 @@ const RecruiterScreen = () => {
         <TabsContent value="myCompany" className="mt-3">
           <Company />
         </TabsContent>
-        <TabsContent value="account" className="mt-3">
+        {/* <TabsContent value="account" className="mt-3">
           <Account />
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </div>
   );

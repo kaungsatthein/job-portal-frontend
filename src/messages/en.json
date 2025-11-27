@@ -17,7 +17,19 @@
     "loginWithRecruiter": "Login with Recruiter",
     "loginWithResearcher": "Login with Researcher",
     "loginSuccess": "Logged in successfully!",
-    "loginFailed": "Unable to log in. Please try again."
+    "loginFailed": "Unable to log in. Please try again.",
+    "welcomeTitle": "Welcome {name}",
+    "welcomeRecruiter": "Thanks for joining as a recruiter. Start posting roles and connecting with researchers.",
+    "welcomeResearcher": "Great to see you here. Update your profile so recruiters can learn more about you.",
+    "updateProfile": "Update information",
+    "continue": "Continue",
+    "profileUpdated": "Profile updated successfully.",
+    "profileUpdateFailed": "Unable to update profile.",
+    "resumeUploaded": "Resume uploaded.",
+    "resumeUploadFailed": "Unable to upload resume.",
+    "resumeCurrent": "Current resume:",
+    "viewResume": "View",
+    "resumeUploading": "Uploading resume..."
   },
   "Home": {
     "searchPrompt": "Search <count>{value}</count> jobs now"
@@ -182,6 +194,7 @@
       "selectCompanyTitle": "Select Company",
       "selectCompanyDescription": "Choose the company for this job posting",
       "noCompanies": "No companies found",
+      "loadingCompanies": "Loading companies...",
       "createCompany": "Create Company",
       "createNewCompany": "Create New Company"
     },

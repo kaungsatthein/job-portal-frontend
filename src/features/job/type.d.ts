@@ -67,6 +67,17 @@ export interface JobPosting {
   applications: JobApplication[];
 }
 
+export interface CreateJobPostingPayload {
+  recruiterId: string;
+  companyId: string;
+  title: string;
+  description: string;
+  jobType: string;
+  location: string;
+  salaryRange: string;
+  status: string;
+}
+
 export interface JobPostingsResponse {
   statusCode: number;
   message: string;
