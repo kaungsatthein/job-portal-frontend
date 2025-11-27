@@ -58,6 +58,19 @@ export type AuthUser = {
     jobId: string;
     status: string;
     createdAt: string;
+    job?: {
+      id: string;
+      title?: string;
+      description?: string;
+      jobType?: string;
+      location?: string;
+      salaryRange?: string;
+      status?: string;
+      createdAt?: string;
+      updatedAt?: string;
+      company?: { name?: string; industryId?: string } | null;
+      recruiter?: { name?: string } | null;
+    } | null;
   }>;
   savedJobs?: Array<{
     id: string;

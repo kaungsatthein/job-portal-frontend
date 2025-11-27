@@ -135,6 +135,7 @@
       "active": "In progress"
     },
     "empty": "No applications in this stage yet.",
+    "loginPrompt": "Sign in to track your applications.",
     "back": "Back to all applications",
     "summaryCard": "Application details",
     "dialog": {

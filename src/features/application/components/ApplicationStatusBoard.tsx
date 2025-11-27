@@ -19,14 +19,13 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import {
-  applications,
+  transformApplications,
   type Actor,
   type Application,
   type Stage,
   type TimelineEntry,
 } from "../data";
-
-const applicationsList = applications;
+import { useAuth } from "@/features/auth";
 
 const stageStyles: Record<
   Stage,
@@ -83,28 +82,50 @@ const stageFilters: (Stage | "all")[] = [
 
 export const ApplicationStatusBoard = ({ locale }: { locale: string }) => {
   const t = useTranslations("ApplicationStatus");
+  const { user, isLoading } = useAuth();
   const [filter, setFilter] = useState<(typeof stageFilters)[number]>("all");
+  const applicationsList = useMemo(
+    () => transformApplications(user?.applications),
+    [user?.applications]
+  );
 
   const filteredApplications = useMemo(
     () =>
       filter === "all"
         ? applicationsList
         : applicationsList.filter((app) => app.stage === filter),
-    [filter]
+    [filter, applicationsList]
   );
 
   const awaitingRecruiter = useMemo(
     () =>
       applicationsList.filter((app) => app.nextStep.owner === "recruiter")
         .length,
-    []
+    [applicationsList]
   );
   const awaitingResearcher = useMemo(
     () =>
       applicationsList.filter((app) => app.nextStep.owner === "researcher")
         .length,
-    []
+    [applicationsList]
   );
+
+  if (isLoading) {
+    return (
+      <div className="mx-4 my-6 space-y-4 lg:mx-8">
+        <Card className="border-dashed">
+          <CardHeader>
+            <div className="h-4 w-40 animate-pulse rounded bg-muted" />
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              {t("summary.updatedLabel", { time: "…" })}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-4 my-6 space-y-6 lg:mx-8">
@@ -186,7 +207,11 @@ export const ApplicationStatusBoard = ({ locale }: { locale: string }) => {
       </div>
 
       {filteredApplications.length === 0 ? (
-        <EmptyState message={t("empty")} />
+        <EmptyState
+          message={user ? t("empty") : t("loginPrompt")}
+          showAction={!user}
+          locale={locale}
+        />
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {filteredApplications.map((application) => (
@@ -418,9 +443,24 @@ const TimelineItem = ({
   );
 };
 
-const EmptyState = ({ message }: { message: string }) => (
-  <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border px-6 py-10 text-center">
+const EmptyState = ({
+  message,
+  showAction,
+  locale,
+}: {
+  message: string;
+  showAction?: boolean;
+  locale: string;
+}) => (
+  <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-border px-6 py-10 text-center">
     <CalendarClock className="h-8 w-8 text-muted-foreground" />
     <p className="text-sm text-muted-foreground">{message}</p>
+    {showAction && (
+      <Link href={`/${locale}`} className="inline-flex">
+        <Button variant="outline" size="sm" className="rounded-full">
+          Browse jobs
+        </Button>
+      </Link>
+    )}
   </div>
 );

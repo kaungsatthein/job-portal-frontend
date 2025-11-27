@@ -4,6 +4,7 @@ export type Stage =
   | "interview"
   | "offer"
   | "declined";
+
 export type Actor = "recruiter" | "researcher" | "system";
 
 export type TimelineEntry = {
@@ -12,6 +13,32 @@ export type TimelineEntry = {
   time: string;
   actor: Actor;
   state: "done" | "active";
+};
+
+export type NextStep = {
+  owner: Exclude<Actor, "system">;
+  label: string;
+  due: string;
+};
+
+export type RawApplication = {
+  id: string;
+  jobId: string;
+  status: string;
+  createdAt: string;
+  job?: {
+    id: string;
+    title?: string;
+    description?: string;
+    jobType?: string;
+    location?: string;
+    salaryRange?: string;
+    status?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    company?: { name?: string } | null;
+    recruiter?: { name?: string } | null;
+  } | null;
 };
 
 export type Application = {
@@ -23,159 +50,219 @@ export type Application = {
   lastUpdate: string;
   recruiter: string;
   summary: string;
-  nextStep: {
-    owner: Exclude<Actor, "system">;
-    label: string;
-    due: string;
-  };
+  nextStep: NextStep;
   timeline: TimelineEntry[];
+  rawStatus: string;
+  createdAt: string;
+  jobDescription: string;
+  jobType: string;
+  salaryRange: string;
+  jobId: string;
+  jobStatus: string;
 };
 
-export const applications: Application[] = [
-  {
-    id: "aurora-fe",
-    role: "Senior Frontend Engineer",
-    company: "Aurora Labs",
-    location: "Remote • GMT+7",
-    stage: "interview",
-    lastUpdate: "Updated today",
-    recruiter: "Khine from Aurora",
-    summary:
-      "Recruiter reviewed your portfolio and booked a product interview.",
-    nextStep: {
-      owner: "researcher",
-      label: "Share your availability for the product interview slot",
-      due: "Aug 19",
-    },
-    timeline: [
-      {
-        title: "Applied with resume + case study link",
-        description: "You attached your React/Next.js portfolio links.",
-        time: "Aug 12 • 9:10 AM",
-        actor: "researcher",
-        state: "done",
-      },
-      {
-        title: "Profile screened by recruiter",
-        description:
-          "Recruiter checked experience and shortlisted for product interview.",
-        time: "Aug 13 • 4:35 PM",
-        actor: "recruiter",
-        state: "done",
-      },
-      {
-        title: "Portfolio review scheduled",
-        description: "Recruiter asked for a 30-min product deep dive.",
-        time: "Aug 15 • 1:00 PM",
-        actor: "recruiter",
-        state: "done",
-      },
-      {
-        title: "Confirm interview slot",
-        description: "Pick a time for the product interview this week.",
-        time: "Awaiting your reply",
-        actor: "researcher",
-        state: "active",
-      },
-    ],
+const statusToStageMap: Record<string, Stage> = {
+  submitted: "applied",
+  reviewing: "reviewing",
+  reviewed: "reviewing",
+  interview: "interview",
+  interviewing: "interview",
+  accepted: "offer",
+  offer: "offer",
+  rejected: "declined",
+  declined: "declined",
+};
+
+const stageSummaries: Record<Stage, string> = {
+  applied: "Your application was submitted and is waiting for review.",
+  reviewing: "Recruiter is reviewing your application.",
+  interview: "Interview process is in progress.",
+  offer: "An offer is ready for your review.",
+  declined: "This application has been closed.",
+};
+
+const stageNextSteps: Record<Stage, NextStep> = {
+  applied: {
+    owner: "recruiter",
+    label: "Recruiter will review your application and respond.",
+    due: "Soon",
   },
-  {
-    id: "nimbus-des",
-    role: "Product Designer (B2B SaaS)",
-    company: "NimbusHQ",
-    location: "Singapore • Hybrid",
-    stage: "reviewing",
-    lastUpdate: "Updated 6h ago",
-    recruiter: "Zaw from Nimbus",
-    summary:
-      "Recruiter is reviewing your design system samples and case study notes.",
-    nextStep: {
-      owner: "recruiter",
-      label: "Share a response after reviewing the design system samples",
-      due: "Aug 18",
-    },
-    timeline: [
-      {
-        title: "Applied with Dribbble + deck",
-        description: "Uploaded deck covering design systems and dashboard UX.",
-        time: "Aug 14 • 8:45 AM",
-        actor: "researcher",
-        state: "done",
-      },
-      {
-        title: "Recruiter requested design system links",
-        description: "Asked for a component library walkthrough.",
-        time: "Aug 14 • 2:05 PM",
-        actor: "recruiter",
-        state: "done",
-      },
-      {
-        title: "You shared component library recording",
-        description: "Sent a Loom and Notion page with interaction tokens.",
-        time: "Aug 15 • 10:30 AM",
-        actor: "researcher",
-        state: "done",
-      },
-      {
-        title: "Waiting for recruiter review",
-        description: "Nimbus team is reviewing the artifacts.",
-        time: "Awaiting recruiter",
-        actor: "recruiter",
-        state: "active",
-      },
-    ],
+  reviewing: {
+    owner: "recruiter",
+    label: "Recruiter is reviewing your profile and will update you.",
+    due: "1-3 days",
   },
-  {
-    id: "vertex-da",
-    role: "Data Analyst",
-    company: "Vertex Talent",
-    location: "Yangon • On-site",
-    stage: "offer",
-    lastUpdate: "Updated yesterday",
-    recruiter: "Su Mon from Vertex",
-    summary: "Offer prepared after final interview and take-home review.",
-    nextStep: {
-      owner: "researcher",
-      label: "Review offer summary and respond",
-      due: "Aug 21",
-    },
-    timeline: [
-      {
-        title: "Applied with SQL portfolio",
-        description: "Shared dashboards plus two case studies.",
-        time: "Aug 05 • 9:00 AM",
-        actor: "researcher",
-        state: "done",
-      },
-      {
-        title: "Recruiter shortlisted you",
-        description: "Notified hiring manager and sent take-home assignment.",
-        time: "Aug 06 • 5:20 PM",
-        actor: "recruiter",
-        state: "done",
-      },
-      {
-        title: "Case study submitted",
-        description:
-          "Delivered cohort analysis and anomaly detection write-up.",
-        time: "Aug 09 • 11:10 AM",
-        actor: "researcher",
-        state: "done",
-      },
-      {
-        title: "Final interview completed",
-        description: "Spoke with hiring manager and data lead.",
-        time: "Aug 11 • 3:00 PM",
-        actor: "system",
-        state: "done",
-      },
-      {
-        title: "Offer ready",
-        description: "Recruiter shared comp band and start timeline.",
-        time: "Respond by Aug 21",
-        actor: "recruiter",
-        state: "active",
-      },
-    ],
+  interview: {
+    owner: "researcher",
+    label: "Prepare and confirm the upcoming interview schedule.",
+    due: "This week",
   },
-];
+  offer: {
+    owner: "researcher",
+    label: "Review the offer details and respond to the recruiter.",
+    due: "3 days",
+  },
+  declined: {
+    owner: "researcher",
+    label: "Review recruiter feedback and explore other openings.",
+    due: "Anytime",
+  },
+};
+
+const formatRelativeTime = (dateString?: string | null) => {
+  if (!dateString) return "Recently";
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return "Recently";
+
+  const diffMs = Date.now() - date.getTime();
+  if (diffMs < 60 * 1000) return "Just now";
+  if (diffMs < 60 * 60 * 1000) {
+    const minutes = Math.max(1, Math.floor(diffMs / (60 * 1000)));
+    return `${minutes}m ago`;
+  }
+  if (diffMs < 24 * 60 * 60 * 1000) {
+    const hours = Math.max(1, Math.floor(diffMs / (60 * 60 * 1000)));
+    return `${hours}h ago`;
+  }
+  const days = Math.max(1, Math.floor(diffMs / (24 * 60 * 60 * 1000)));
+  if (days < 7) return `${days}d ago`;
+  return date.toLocaleDateString();
+};
+
+const formatDateTime = (dateString?: string | null) => {
+  if (!dateString) return "Unknown";
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return "Unknown";
+  return date.toLocaleString();
+};
+
+const mapStatusToStage = (status?: string | null): Stage => {
+  if (!status) return "applied";
+  const key = status.toLowerCase();
+  return statusToStageMap[key] ?? "applied";
+};
+
+const buildTimeline = (
+  stage: Stage,
+  createdAt: string,
+  updatedAt: string | undefined | null,
+  jobTitle: string,
+  company: string
+): TimelineEntry[] => {
+  const timeline: TimelineEntry[] = [
+    {
+      title: "Application submitted",
+      description: `You applied for ${jobTitle} at ${company}.`,
+      time: formatDateTime(createdAt),
+      actor: "researcher",
+      state: "done",
+    },
+  ];
+
+  const recruiterReviewEntry: TimelineEntry = {
+    title: "Recruiter review",
+    description: "Recruiter will review your profile and share updates.",
+    time: formatRelativeTime(updatedAt ?? createdAt),
+    actor: "recruiter",
+    state: stage === "applied" ? "active" : "done",
+  };
+
+  timeline.push(recruiterReviewEntry);
+
+  if (stage === "reviewing") {
+    timeline.push({
+      title: "Awaiting recruiter decision",
+      description: "Once finished reviewing, they will contact you.",
+      time: "In progress",
+      actor: "recruiter",
+      state: "active",
+    });
+  }
+
+  if (stage === "interview") {
+    timeline.push({
+      title: "Interview process",
+      description: "Interview is scheduled or being arranged.",
+      time: "Upcoming",
+      actor: "system",
+      state: "active",
+    });
+  }
+
+  if (stage === "offer") {
+    timeline.push({
+      title: "Offer shared",
+      description: "Recruiter prepared an offer for you.",
+      time: formatRelativeTime(updatedAt),
+      actor: "recruiter",
+      state: "done",
+    });
+    timeline.push({
+      title: "Review offer",
+      description: "Review the offer details and respond.",
+      time: "Awaiting your response",
+      actor: "researcher",
+      state: "active",
+    });
+  }
+
+  if (stage === "declined") {
+    timeline.push({
+      title: "Application closed",
+      description: "Recruiter decided not to move forward.",
+      time: formatRelativeTime(updatedAt ?? createdAt),
+      actor: "recruiter",
+      state: "done",
+    });
+  }
+
+  return timeline;
+};
+
+export const transformApplication = (application: RawApplication): Application => {
+  const stage = mapStatusToStage(application.status);
+  const job = application.job ?? null;
+  const role = job?.title ?? "Untitled role";
+  const company = job?.company?.name ?? "Unknown company";
+  const location = job?.location ?? "Not specified";
+  const recruiter = job?.recruiter?.name ?? "Hiring team";
+  const summary = stageSummaries[stage];
+  const nextStep = stageNextSteps[stage];
+  const lastUpdate = formatRelativeTime(job?.updatedAt ?? application.createdAt);
+  const timeline = buildTimeline(
+    stage,
+    application.createdAt,
+    job?.updatedAt ?? job?.createdAt,
+    role,
+    company
+  );
+
+  return {
+    id: application.id,
+    role,
+    company,
+    location,
+    stage,
+    lastUpdate,
+    recruiter,
+    summary,
+    nextStep,
+    timeline,
+    rawStatus: application.status,
+    createdAt: application.createdAt,
+    jobDescription: job?.description ?? "No description provided.",
+    jobType: job?.jobType ?? "Not specified",
+    salaryRange: job?.salaryRange ?? "Not specified",
+    jobId: job?.id ?? application.jobId,
+    jobStatus: job?.status ?? "pending",
+  };
+};
+
+export const transformApplications = (
+  applications: RawApplication[] | undefined | null
+): Application[] => {
+  if (!Array.isArray(applications)) {
+    return [];
+  }
+  return applications.map(transformApplication);
+};

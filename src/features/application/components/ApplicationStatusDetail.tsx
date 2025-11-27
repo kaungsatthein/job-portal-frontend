@@ -10,7 +10,7 @@ import {
   MessageSquare,
   Sparkles,
 } from "lucide-react";
-import { JSX } from "react";
+import { JSX, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -22,7 +22,14 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import type { Actor, Application, Stage, TimelineEntry } from "../data";
+import { useAuth } from "@/features/auth";
+import {
+  transformApplications,
+  type Actor,
+  type Application,
+  type Stage,
+  type TimelineEntry,
+} from "../data";
 
 const stageStyles: Record<
   Stage,
@@ -262,4 +269,54 @@ const TimelineItem = ({ item, isLast }: { item: TimelineEntry; isLast: boolean }
       </div>
     </div>
   );
+};
+
+export const ApplicationStatusDetailContainer = ({
+  applicationId,
+  locale,
+}: {
+  applicationId: string;
+  locale: string;
+}) => {
+  const t = useTranslations("ApplicationStatus");
+  const { user, isLoading } = useAuth();
+  const applications = useMemo(
+    () => transformApplications(user?.applications),
+    [user?.applications]
+  );
+  const application = applications.find((app) => app.id === applicationId);
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">{t("summary.updatedLabel", { time: "…" })}</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!application) {
+    return (
+      <div className="space-y-4">
+        <Link
+          href={`/${locale}/application-status`}
+          className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t("back")}
+        </Link>
+        <Card className="border-dashed">
+          <CardContent className="py-10 text-center text-sm text-muted-foreground">
+            {t("empty")}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return <ApplicationStatusDetail application={application} locale={locale} />;
 };
